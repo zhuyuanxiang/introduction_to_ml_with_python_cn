@@ -6,10 +6,20 @@
       <w>everytime</w>
       <w>gbdt</w>
       <w>gbrt</w>
+      <w>imdb</w>
       <w>kmeans</w>
+      <w>lbfgs</w>
+      <w>lemmatization</w>
+      <w>nltk</w>
       <w>onehot</w>
       <w>preprocess</w>
+      <w>preprocessing</w>
       <w>scaler</w>
+      <w>sklearn</w>
+      <w>spacy</w>
+      <w>tfidf</w>
+      <w>unsup</w>
+      <w>vectorizer</w>
     </words>
   </dictionary>
 </component>

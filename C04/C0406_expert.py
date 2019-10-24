@@ -8,7 +8,7 @@
 @Project    :   introduction_to_ml_with_python
 @File       :   C0406_expert.py
 @Version    :   v0.1
-@Time       :   2019-10-21 17:24
+@Time       :   2019-10-10 11:00
 @License    :   (C)Copyright 2018-2019, zYx.Tom
 @Reference  :   《Python机器学习基础教程》, Sec04
 @Desc       :   
@@ -19,7 +19,7 @@ import pandas as pd
 import mglearn
 
 # 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 5, suppress = True, threshold = np.inf, linewidth = 200)
+np.set_printoptions(precision = 3, suppress = True, threshold = np.inf, linewidth = 200)
 
 
 # 4.6. 利用专家知识
@@ -257,7 +257,7 @@ def feature_POSIX_weekday_everytime_one_hot_poly():
     poly_transformer = PolynomialFeatures(degree = 2, interaction_only = True, include_bias = False)
     X_hour_week_onehot_poly = poly_transformer.fit_transform(X_hour_week_onehot)
     number_title = "将 One-Hot 编码的特征映射为多项式特征作为先验知识做出的预测"
-    print('-' * 5, number_title, '-' * 5)
+    print('\n', '-' * 5, number_title, '-' * 5)
 
     import random
     rand_number_list = random.sample(range(0, len(y)), 5)

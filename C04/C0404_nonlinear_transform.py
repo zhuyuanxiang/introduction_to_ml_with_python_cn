@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 5, suppress = True, threshold = np.inf, linewidth = 200)
+np.set_printoptions(precision = 3, suppress = True, threshold = np.inf, linewidth = 200)
 
 # 4.4. 单变量非线性变换
 def single_variable_nonlinear_transform():
