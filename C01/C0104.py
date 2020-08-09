@@ -13,23 +13,23 @@
 @Reference  :   《Python机器学习基础教程》, Ch0104，P05
 @Desc       :   引言。必要的库和工具
 """
+import config
 import matplotlib.pyplot as plt
-import mglearn
 import numpy as np
+import pandas as pd
 
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
 
 # 1.4.2. NumPy
 # 创建一个ndarray类的对象，是一个二维NumPy数组，也叫数组。
+# NumPy 的学习可以参考 《利用Python进行数据分析》
 def numpy_train():
-    import numpy as np
     x = np.array([[1, 2, 3], [4, 5, 6]])
     print("x:\n{}".format(x))
 
 
 # 1.4.3. SciPy
+# SciPy 的学习可以参考 《Scipy Lecture Notes》(http://scipy-lectures.org/)
 def scipy_train():
-    import numpy as np
     # 创建一个二维NumPy数组，对角线为1，其余为0，稀疏矩阵（Sparse Matrix）的稠密表示（Dense Representation）
     eye = np.eye(4)
     print('NumPy array:\n{}'.format(eye))
@@ -50,7 +50,7 @@ def scipy_train():
 
     # 输出一个全1的4*1向量，将之转化为COO格式的稀疏矩阵
     print('\n--------')
-    data=np.ones(4)
+    data = np.ones(4)
     print('NumPy array:\n{}'.format(data))
     row_indices = np.arange(4)
     col_indices = np.arange(4)
@@ -60,8 +60,6 @@ def scipy_train():
 
 # 1.4.4. matplotlib
 def matplotlib_train():
-    import numpy as np
-    import matplotlib.pyplot as plt
     x = np.linspace(-10, 10, 100)
     y = np.sin(x)
     plt.plot(x, y, marker = 'x')
@@ -70,7 +68,6 @@ def matplotlib_train():
 
 # 1.4.5. pandas
 def pandas_train():
-    import pandas as pd
     data = {
             'Name': ['John', 'Anna', 'Peter', 'Linda'],
             'Location': ['New York', 'Paris', 'Berlin', 'London'],
@@ -94,9 +91,8 @@ if __name__ == "__main__":
 
     # 1.4.5. pandas
     pandas_train()
-    import winsound
 
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass 
+    import tools
+    tools.beep_end()
+    tools.show_figures()
+
