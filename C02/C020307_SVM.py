@@ -14,19 +14,17 @@
 @Desc       :   监督学习算法。核支持向量机。
 """
 # Chap2 监督学习
+import config
 import numpy as np
 import matplotlib.pyplot as plt
 import mglearn
-# 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
-
 
 
 # 1)线性模型与非线性特征
 def plot_datasets():
     """生成模拟数据"""
     from sklearn.datasets import make_blobs
-    X, y = make_blobs(centers = 4, random_state = 8)
+    X, y = make_blobs(centers = 4, random_state = config.seed)
     y = y % 2  # 生成了4类数据，变换成2类数据
     mglearn.discrete_scatter(X[:, 0], X[:, 1], y)
     plt.xlabel('Feature 0')
@@ -34,10 +32,11 @@ def plot_datasets():
     plt.legend()
     plt.suptitle("图2-36：二分类数据集（性别不是线性可分）")
 
+
 def LinearSVC_blob_datasets():
     """对模拟数据进行线性分类"""
     from sklearn.datasets import make_blobs
-    X, y = make_blobs(centers = 4, random_state = 8)
+    X, y = make_blobs(centers = 4, random_state = config.seed)
     y = y % 2
 
     from sklearn.svm import LinearSVC
@@ -54,7 +53,7 @@ def LinearSVC_blob_datasets():
 def plot_nonlinear_datasets():
     """为模拟数据增加一个新的特征，将线性不可分的数据变换到三维空间，变成线性可分"""
     from sklearn.datasets import make_blobs
-    X, y = make_blobs(centers = 4, random_state = 8)
+    X, y = make_blobs(centers = 4, random_state = config.seed)
     y = y % 2
 
     # 添加一个新特征，新特征 = 第二个特征 ^ 2
@@ -67,7 +66,7 @@ def plot_nonlinear_datasets():
     ax.scatter(X_new[mask, 0], X_new[mask, 1], X_new[mask, 2], c = 'b',
                cmap = mglearn.cm2, s = 60)
     ax.scatter(X_new[~mask, 0], X_new[~mask, 1], X_new[~mask, 2], c = 'r',
-               cmap = mglearn.cm2, s = 60,marker = '^')
+               cmap = mglearn.cm2, s = 60, marker = '^')
     ax.set_xlabel('feature 0')
     ax.set_ylabel('feature 1')
     ax.set_zlabel('feature1 ** 2')
@@ -76,7 +75,7 @@ def plot_nonlinear_datasets():
 
 def LinearSVC_nonlinear_datasets():
     from sklearn.datasets import make_blobs
-    X, y = make_blobs(centers = 4, random_state = 8)
+    X, y = make_blobs(centers = 4, random_state = config.seed)
     y = y % 2
 
     # 添加一个新特征，新特征 = 第二个特征 ^ 2
@@ -84,7 +83,8 @@ def LinearSVC_nonlinear_datasets():
 
     # 支持向量机 线性可分
     from sklearn.svm import LinearSVC
-    linear_svm_3d = LinearSVC().fit(X_new, y)
+    linear_svm_3d = LinearSVC()
+    linear_svm_3d.fit(X_new, y)
     coef, intercept = linear_svm_3d.coef_.ravel(), linear_svm_3d.intercept_
 
     # 3D图中显示线性决策边界
@@ -101,7 +101,7 @@ def LinearSVC_nonlinear_datasets():
     ax.scatter(X_new[mask, 0], X_new[mask, 1], X_new[mask, 2], c = 'b',
                cmap = mglearn.cm2, s = 60)
     ax.scatter(X_new[~mask, 0], X_new[~mask, 1], X_new[~mask, 2], c = 'r',
-               cmap = mglearn.cm2, s = 60,marker = '^')
+               cmap = mglearn.cm2, s = 60, marker = '^')
     ax.set_xlabel('feature 0')
     ax.set_ylabel('feature 1')
     ax.set_zlabel('feature1 ** 2')
@@ -110,7 +110,7 @@ def LinearSVC_nonlinear_datasets():
 
 def plot_2d_LinearSVC_nonlinear_datasets():
     from sklearn.datasets import make_blobs
-    X, y = make_blobs(centers = 4, random_state = 8)
+    X, y = make_blobs(centers = 4, random_state = config.seed)
     y = y % 2
 
     # 添加一个新特征，新特征 = 第二个特征 ^ 2
@@ -118,7 +118,8 @@ def plot_2d_LinearSVC_nonlinear_datasets():
 
     # 支持向量机 线性可分
     from sklearn.svm import LinearSVC
-    linear_svm_3d = LinearSVC().fit(X_new, y)
+    linear_svm_3d = LinearSVC()
+    linear_svm_3d.fit(X_new, y)
     coef, intercept = linear_svm_3d.coef_.ravel(), linear_svm_3d.intercept_
 
     xx = np.linspace(X_new[:, 0].min() - 2, X_new[:, 0].max() + 2, 50)
@@ -154,7 +155,8 @@ def svc_2d_classification():
     X, y = mglearn.tools.make_handcrafted_dataset()
 
     from sklearn.svm import SVC
-    svm = SVC(kernel = 'rbf', C = 10, gamma = 0.1).fit(X, y)
+    svm = SVC(kernel = 'rbf', C = 10, gamma = 0.1)
+    svm.fit(X, y)
     mglearn.plots.plot_2d_separator(svm, X, eps = .5)
     mglearn.discrete_scatter(X[:, 0], X[:, 1], y)
 
@@ -188,18 +190,19 @@ def svc_difference_parameters():
     plt.suptitle("图2-42：设置不同的 C 和 gamma 参数--两个数据中心的高斯数据对应的决策边界和支持向量")
 
 
-def svc_cancer_overfitting():
+def svc_cancer_over_fitting():
     from sklearn.datasets import load_breast_cancer
     from sklearn.model_selection import train_test_split
     # cancer 数据集的特征具有完全不同的数量级。对Kernel-SVM方法影响极大。
     cancer = load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,
+                                                        random_state = config.seed)
 
     from sklearn.svm import SVC
     svc = SVC()
     svc.fit(X_train, y_train)
-    print('='*20)
-    print("-- Support Vector Classification Overfitting--")
+    print('=' * 20)
+    print("-- Support Vector Classification Over-fitting --")
     print('Training set score: {:.3f}'.format(svc.score(X_train, y_train)))
     print('Test set score: {:.3f}'.format(svc.score(X_test, y_test)))
 
@@ -220,7 +223,8 @@ def normalize_cancer_data():
     from sklearn.datasets import load_breast_cancer
     from sklearn.model_selection import train_test_split
     cancer = load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,
+                                                        random_state = config.seed)
 
     min_on_training = X_train.min(axis = 0)
     range_on_training = (X_train - min_on_training).max(axis = 0)
@@ -234,7 +238,7 @@ def print_normalized_cancer_data():
     """输出归一化的数据集"""
     X_train_scaled, X_test_scaled, y_train, y_test = normalize_cancer_data()
 
-    print('='*20)
+    print('=' * 20)
     print("-- 归一化的数据集 --")
     print('Minimum for each feature\n{}'.format(X_train_scaled.min(axis = 0)))
     print('Maximum for each feature\n{}'.format(X_train_scaled.max(axis = 0)))
@@ -264,10 +268,9 @@ def fit_normalized_cancer_data():
     print('Training set score: {:.3f}'.format(svc.score(X_train_scaled, y_train)))
     print('Test set score: {:.3f}'.format(svc.score(X_test_scaled, y_test)))
 
-
     # C 越小，考虑的是全局，模型也越简单；C 越大，考虑的是每个点的正确性，模型也越复杂
     print('=' * 20)
-    for c_value in [1,10,100,1000]:
+    for c_value in [1, 10, 100, 1000]:
         svc = SVC(C = c_value, gamma = 'auto')
         svc.fit(X_train_scaled, y_train)
         print('C=', c_value)
@@ -279,7 +282,7 @@ def fit_normalized_cancer_data():
     # gamma越小，高斯核的范围越宽；gamma越大，高斯核的范围越窄
     # 过拟合会严重影响测试集的精确度
     print('=' * 20)
-    for gamma in [0.1,1,10,100]:
+    for gamma in [0.1, 1, 10, 100]:
         svc = SVC(gamma = gamma)
         svc.fit(X_train_scaled, y_train)
         print('gamma=', gamma)
@@ -290,16 +293,17 @@ def fit_normalized_cancer_data():
     # 两个最优的参数，结果不最优
     # 过拟合会严重影响测试集的精确度
     # 根据影响力调整的的参数，结果接近最优，重要的是防止过拟合，可以提高测试集的精确度
-    print('='*20)
-    for c_value,gamma in [(0.1,10),(0.1,20),(1,1),(1,10),(1,20),(10,1000)]:
+    print('=' * 20)
+    for c_value, gamma in [(0.1, 10), (0.1, 20), (1, 1), (1, 10), (1, 20), (10, 1000)]:
         svc = SVC(C = c_value, gamma = gamma)
         svc.fit(X_train_scaled, y_train)
         print('C=', c_value, 'gamma=', gamma)
         print('Training set score: {:.3f}'.format(svc.score(X_train_scaled, y_train)))
         print('Test set score: {:.3f}'.format(svc.score(X_test_scaled, y_test)))
-        print('-'*20)
+        print('-' * 20)
         pass
     pass
+
 
 if __name__ == "__main__":
     # 生成模拟数据
@@ -324,7 +328,7 @@ if __name__ == "__main__":
     # svc_difference_parameters()
 
     # 图2-43：Cancer 数据集的特征数据的取值范围--（注意y轴的对数坐标）
-    # svc_cancer_overfitting()
+    # svc_cancer_over_fitting()
 
     # 输出归一化的数据集
     # print_normalized_cancer_data()
@@ -335,9 +339,6 @@ if __name__ == "__main__":
     # 学习归一化后的cancer数据集
     fit_normalized_cancer_data()
 
-    import winsound
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    import tools
+    tools.beep_end()
+    tools.show_figures()
