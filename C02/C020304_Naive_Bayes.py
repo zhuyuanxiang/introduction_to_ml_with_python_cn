@@ -15,7 +15,7 @@
 """
 
 # Chap2 监督学习
-import pprint
+import config
 import numpy as np
 
 # 设置数据显示的精确度为小数点后3位
@@ -86,6 +86,7 @@ for label in np.unique(y):
     pass
 print('Feature counts:{}\t'.format(counts))
 
-import winsound
-# 运行结束的提醒
-winsound.Beep(600, 500)
+import tools
+
+tools.beep_end()
+tools.show_figures()
