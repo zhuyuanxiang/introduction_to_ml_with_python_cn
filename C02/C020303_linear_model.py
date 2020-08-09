@@ -15,15 +15,13 @@
 """
 
 # 2.3. 监督学习算法
+import config
 import matplotlib.pyplot as plt
 import mglearn
 import numpy as np
-import sklearn
-
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
 
 from mglearn.datasets import load_extended_boston
-from sklearn.datasets import make_blobs
+from sklearn.datasets import make_blobs, load_breast_cancer
 
 from sklearn.svm import LinearSVC
 
@@ -49,13 +47,13 @@ def linear_model_regression():
 def least_squares():
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.make_wave(n_samples = 60)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
 
     from sklearn.linear_model import LinearRegression
     lr = LinearRegression().fit(X_train, y_train)
     print('lr.coef_: {}'.format(lr.coef_))
     print('lr.intercept_: {}'.format(lr.intercept_))
-    # 训练集与测试集的得分非常接近，说明训练存在欠拟合。
+    # 训练集与测试集的得分非常接近，并且模型精度较低，说明训练存在欠拟合。
     print('Training set score: {:.2f}'.format(lr.score(X_train, y_train)))
     print('Test set score: {:.2f}'.format(lr.score(X_test, y_test)))
 
@@ -65,7 +63,7 @@ def least_squares():
 def least_squares_high_dimension():
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.load_extended_boston()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
 
     from sklearn.linear_model import LinearRegression
     lr = LinearRegression().fit(X_train, y_train)
@@ -82,7 +80,7 @@ def compare_ridge_high_dimension_figure():
     """利用图形，展示岭回归在固定高维数据集的情况下，不同alpha值的效果"""
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.load_extended_boston()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
 
     # 线性回归
     from sklearn.linear_model import LinearRegression
@@ -98,7 +96,9 @@ def compare_ridge_high_dimension_figure():
     plt.ylim(-50, 50)
     plt.suptitle("线性回归系数")
 
-    # 岭回归，alpha值较小时，模型过拟合
+    # 岭回归：alpha 值的增加，降低训练集的精度，但是可以提高测试集的精度
+    # alpha 值较小时，模型过拟合
+    # alpha 值较大时，模型欠拟合
     from sklearn.linear_model import Ridge
     print('=' * 20)
     for alpha in [0.005, 0.01, 0.05, 0.1, 0.5, 1, 10]:
@@ -121,7 +121,7 @@ def compare_ridge_high_dimension_coef_():
     """利用得分曲线，展示岭回归在固定高维数据集的情况下，不同alpha值的效果"""
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.load_extended_boston()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
 
     alpha_range = [pow(10, (alpha / 10)) for alpha in range(-50, 1)]
     train_score = []
@@ -132,6 +132,7 @@ def compare_ridge_high_dimension_coef_():
         train_score.append(ridge.score(X_train, y_train))
         test_score.append(ridge.score(X_test, y_test))
 
+    plt.figure()
     plt.plot(alpha_range, train_score, label = 'train score')
     plt.plot(alpha_range, test_score, label = 'test score')
     plt.xlabel("alpha")
@@ -145,7 +146,7 @@ def compare_ridge_fix_alpha():
     """利用学习曲线，展示岭回归在固定alpha值的情况下，不同数据量的的效果"""
     # 当数据集合中少于40个数据点时，线性回归学习不到任何有价值的信息；
     # 随着模型可用的数据越来越多，两个模型的性能都在提升
-    # 当模型可用的数据足够多时，两个模型的性能完全相同，即正则化不再重要
+    # 当模型中可用的数据足够多时，两个模型的性能完全相同，即正则化不再重要
     mglearn.plots.plot_ridge_n_samples()
     plt.suptitle("图2-13：岭回归和线性回归在Boston房价数据集上的学习曲线")
 
@@ -155,7 +156,7 @@ def compare_lasso_high_dimension_figure():
     """利用图形，展示Lasso回归在固定高维数据集的情况下，不同alpha值的效果"""
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.load_extended_boston()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
 
     # 线性回归
     from sklearn.linear_model import LinearRegression
@@ -194,7 +195,7 @@ def compare_lasso_high_dimension_coef_():
     """利用得分曲线，展示Lasso回归在固定高维数据集的情况下，不同alpha值的效果"""
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.load_extended_boston()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
 
     alpha_range = [pow(10, (alpha / 10)) for alpha in range(-50, -20)]
     train_score = []
@@ -218,7 +219,7 @@ def compare_elastic_high_dimension_coef_():
     # 运行时间比较长
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.load_extended_boston()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
 
     alpha_range = [pow(10, (alpha / 10)) for alpha in range(-50, 0, 3)]
     lasso_train_score = []
@@ -243,7 +244,7 @@ def compare_elastic_high_dimension_coef_():
         elastic_train_score.append(elastic.score(X_train, y_train))
         elastic_test_score.append(elastic.score(X_test, y_test))
 
-        # 固定最好的L1正则化系数，变动L2系数
+        # 将最好的L1正则化系数固定，变动L2系数
         elastic = ElasticNet(alpha = alpha, l1_ratio = 0.005).fit(X_train, y_train)
         fix_elastic_train_score.append(elastic.score(X_train, y_train))
         fix_elastic_test_score.append(elastic.score(X_test, y_test))
@@ -271,7 +272,7 @@ def compare_linear_classification_figure():
 
     # 两个模型得到了相似的决策边界，
     # 都有两个点的分类是错误的，
-    # 都默认使用了L2正则化
+    # 都默认使用了L2正则化, C 是正则化参数
     from sklearn.linear_model import LogisticRegression
     for model, ax in zip([LinearSVC(C = 0.1), LogisticRegression(C = 0.1)], axes):
         clf = model.fit(X, y)
@@ -297,15 +298,16 @@ def compare_lsvc_figure():
 # 线性SVM和不同C值的Logistic回归在cancer数据集上学到的系数
 def compare_logistic_classification_figure():
     from sklearn.model_selection import train_test_split
-    cancer = sklearn.datasets.load_breast_cancer()
+    cancer = load_breast_cancer()
     X_train, X_test, y_train, y_test = train_test_split(
-            cancer.data, cancer.target, stratify = cancer.target, random_state = 42)
+            cancer.data, cancer.target, stratify = cancer.target, random_state = config.seed)
 
-    linear_svc = LinearSVC(max_iter = 10000).fit(X_train, y_train)
+    linear_svc = LinearSVC(max_iter = 10000)
+    linear_svc.fit(X_train, y_train)
     print('Linear Support Vector Classification')
     print('Training set score: {:.3f}'.format(linear_svc.score(X_train, y_train)))
     print('Test set score: {:.3f}'.format(linear_svc.score(X_test, y_test)))
-    print('*'*20)
+    print('*' * 20)
     plt.figure()
     plt.plot(linear_svc.coef_.T, 's', label = 'max_iter=10000')
     plt.xlabel('Coefficient index')
@@ -320,11 +322,12 @@ def compare_logistic_classification_figure():
     for C in [0.01, 0.1, 1, 10, 100]:
         # 训练集和测试集的性能非常接近，因此模型有可能欠拟合
         # 更复杂的模型性能更好，但是C值过大后也会发生过拟合问题
-        logistic_regression = LogisticRegression(C = C, solver = 'lbfgs', max_iter = 10000).fit(X_train, y_train)
+        logistic_regression = LogisticRegression(C = C, solver = 'lbfgs', max_iter = 10000)
+        logistic_regression.fit(X_train, y_train)
         print('Logistic Regression C: {}'.format(C))
         print('Training set score: {:.3f}'.format(logistic_regression.score(X_train, y_train)))
         print('Test set score: {:.3f}'.format(logistic_regression.score(X_test, y_test)))
-        print('-'*20)
+        print('-' * 20)
         plt.figure()
         plt.plot(logistic_regression.coef_.T, 'o', label = 'C= {}'.format(C))
         plt.xlabel('Coefficient index')
@@ -340,18 +343,20 @@ def compare_logistic_classification_figure():
 # 线性SVM和不同C值的L1 正则化的Logistic回归在cancer数据集上学到的系数
 def compare_logistic_classification_l1_figure():
     from sklearn.model_selection import train_test_split
-    cancer = sklearn.datasets.load_breast_cancer()
+    from sklearn.datasets import load_breast_cancer
+    cancer = load_breast_cancer()
     X_train, X_test, y_train, y_test = train_test_split(
-            cancer.data, cancer.target, stratify = cancer.target, random_state = 42)
+            cancer.data, cancer.target, stratify = cancer.target, random_state = config.seed)
 
     from sklearn.linear_model import LogisticRegression
     for C in [0.001, 0.01, 0.1, 1, 10, 100]:
-        logistic_regression = LogisticRegression(
-                C = C, penalty = 'l1', solver = 'liblinear', max_iter = 10000).fit(X_train, y_train)
+        logistic_regression = LogisticRegression(penalty = 'l1', C = C, solver = 'liblinear',
+                                                 max_iter = 10000)
+        logistic_regression.fit(X_train, y_train)
         print('Logistic Regression C: {}'.format(C))
         print('Training set score: {:.3f}'.format(logistic_regression.score(X_train, y_train)))
         print('Test set score: {:.3f}'.format(logistic_regression.score(X_test, y_test)))
-        print('-'*20)
+        print('-' * 20)
         plt.figure()
         plt.plot(logistic_regression.coef_.T, 'o', label = 'C= {}'.format(C))
         plt.xlabel('Coefficient index')
@@ -364,16 +369,20 @@ def compare_logistic_classification_l1_figure():
         plt.suptitle("图2-18：C={}的L1正则化的Logistic回归在cancer数据集上学到的系数".format(C))
         pass
 
+
 # 图2-18：对于不同的C值，L1正则化的Logistic回归在Cancer数据集上学到的系数
 def logistic_lasso_classification():
     from sklearn.model_selection import train_test_split
-    cancer = sklearn.datasets.load_breast_cancer()
+    from sklearn.datasets import load_breast_cancer
+    cancer = load_breast_cancer()
     X_train, X_test, y_train, y_test = train_test_split(
-            cancer.data, cancer.target, stratify = cancer.target, random_state = 42)
+            cancer.data, cancer.target, stratify = cancer.target, random_state = config.seed)
 
     from sklearn.linear_model import LogisticRegression
     for C, marker in zip([0.001, 0.01, 0.1, 1, 10, 100], ['o', '^', 'v', 'h', '8', '+']):
-        lr_l1 = LogisticRegression(C = C, penalty = 'l1', solver = 'liblinear', max_iter = 10000).fit(X_train, y_train)
+        lr_l1 = LogisticRegression(penalty = 'l1', C = C, solver = 'liblinear',
+                                   max_iter = 10000)
+        lr_l1.fit(X_train, y_train)
         print('Logistic Regression C: {}'.format(C))
         print('Training accuracy of l1 with {:.2f}'.format(lr_l1.score(X_train, y_train)))
         print('Test accuracy of l1  with {:.2f}'.format(lr_l1.score(X_test, y_test)))
@@ -393,7 +402,7 @@ def logistic_lasso_classification():
 def show_three_classes_dataset():
     # 从高斯分布中采样得到的三类数据，每个数据点具有两个特征
     # centers表示数据有几个中心，默认是3个中心
-    X, y = make_blobs(random_state = 42, centers = 3)
+    X, y = make_blobs(random_state = config.seed, centers = 3)
     print('Data shape: ', X.shape)
     print('Class shape: ', y.shape)
     mglearn.discrete_scatter(X[:, 0], X[:, 1], y)
@@ -403,30 +412,33 @@ def show_three_classes_dataset():
     plt.legend()
     plt.suptitle("图2-19：包含3个类别的二维简单数据集")
 
+
 # “一对其余”分类器学到的二分类决策边界和得到的多分类决策边界
 def linear_model_multi_classification():
     # 每次划分都是“一对其余”。因此到5个类别后，被包围的中间类别就无法正确分类了。
     CLASS_NUMBER = 3
-    X, y = make_blobs(n_samples = 100, random_state = 42, centers = CLASS_NUMBER)
+    X, y = make_blobs(n_samples = 100, random_state = config.seed, centers = CLASS_NUMBER)
     print('Data shape: ', X.shape)
     print('Class shape: ', y.shape)
     mglearn.discrete_scatter(X[:, 0], X[:, 1], y)
 
-    linear_svm = LinearSVC(max_iter = 10000).fit(X, y)
+    linear_svm = LinearSVC(max_iter = 10000)
+    linear_svm.fit(X, y)
     print('Coefficient shape: ', linear_svm.coef_.shape)
     print('Intercept shape: ', linear_svm.intercept_.shape)
 
     line = np.linspace(-15, 15)
     for coef, intercept, color in zip(
-            linear_svm.coef_, linear_svm.intercept_, ['blue', 'red', 'green', 'yellow', 'purple', 'black']):
+            linear_svm.coef_, linear_svm.intercept_,
+            ['blue', 'red', 'green', 'yellow', 'purple', 'black']):
         plt.plot(line, -(line * coef[0] + intercept) / coef[1], c = color)
 
     plt.xlim(-10, 8)
     plt.ylim(-10, 15)
     plt.xlabel('Feature 0')
     plt.ylabel('Feature 1')
-    legend = ['Class {}'.format(x) for x in range(CLASS_NUMBER)] \
-             + ['Line Class {}'.format(x) for x in range(CLASS_NUMBER)]
+    legend = ['Class {}'.format(x) for x in range(CLASS_NUMBER)] + ['Line Class {}'.format(x) for x
+                                                                    in range(CLASS_NUMBER)]
     plt.legend(legend, loc = (1.01, 0.3))
     plt.suptitle("图2-20：三个“一对其余”分类器学到的二分类决策边界")
 
@@ -447,7 +459,8 @@ def linear_model_multi_classification():
     # legend = ['Class {}'.format(x) for x in range(CLASS_NUMBER)] \
     #          + ['Line Class {}'.format(x) for x in range(CLASS_NUMBER)]
     plt.legend(legend, loc = (1.01, 0.3))
-    mglearn.plots.plot_2d_classification(linear_svm, X, fill = True, alpha = .7, cm = mglearn.plot_helpers.cm_cycle)
+    mglearn.plots.plot_2d_classification(linear_svm, X, fill = True, alpha = .7,
+                                         cm = mglearn.plot_helpers.cm_cycle)
     plt.suptitle("图2-21：三个“一对其余”分类器得到的多分类决策边界")
 
 
@@ -504,9 +517,7 @@ if __name__ == "__main__":
     # “一对其余”分类器学到的二分类决策边界和得到的多分类决策边界
     linear_model_multi_classification()
 
-    import winsound
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    import tools
+
+    tools.beep_end()
+    tools.show_figures()
