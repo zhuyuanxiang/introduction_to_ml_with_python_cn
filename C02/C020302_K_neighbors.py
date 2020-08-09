@@ -14,14 +14,13 @@
 @Desc       :   监督学习算法。K近邻
 """
 
-
 # 2.3. 监督学习算法
 import matplotlib.pyplot as plt
 import numpy as np
 import mglearn
 import sklearn
 
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
+from mglearn import datasets
 
 
 # 2.3.2. k-NN（k近邻）
@@ -34,18 +33,34 @@ def compare_NeighborsNumber():
         plt.suptitle("图2-5：{}近邻模型对forge数据集的预测结果".format(n_neighbors))
         pass
 
+
 # 训练K近邻分类模型
+def make_my_forge():
+    # a carefully hand-designed dataset lol
+    X, y = sklearn.datasets.make_blobs(centers = 2, random_state = 4, n_samples = 30)
+    y[np.array([7, 27])] = 0
+    mask = np.ones(len(X), dtype = np.bool)
+    mask[np.array([0, 1, 5, 26])] = 0
+    X, y = X[mask], y[mask]
+    return X, y
+
+
 def fit_KNeighborsClassifier():
-    # 准备forget数据集，数据越多越准确
-    X, y = mglearn.datasets.make_forge()
+    # 准备forge数据集(二分类问题)，数据越多越准确
+    X, y = datasets.make_forge()
+    X, y = make_my_forge()
+    plt.scatter(X[:, 0], X[:, 1], y, cmap = mglearn.cm2, marker = '*')
+
     from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
 
     from sklearn.neighbors import KNeighborsClassifier
-    clf = KNeighborsClassifier(n_neighbors = 3)
-    clf.fit(X_train, y_train)
-    print('Test set predictions: {}'.format(clf.predict(X_test)))
-    print('Test set accuracy: {:.2f}'.format(clf.score(X_test, y_test)))
+    for n_neighbors in [1, 3]:
+        clf = KNeighborsClassifier(n_neighbors = n_neighbors)
+        clf.fit(X_train, y_train)
+        print('-' * 5 + '>n_neighbors={}<'.format(n_neighbors) + '-' * 5)
+        print('Test set predictions: {}'.format(clf.predict(X_test)))
+        print('Test set accuracy: {:.2f}'.format(clf.score(X_test, y_test)))
 
 
 # 2) 分析 KNeighborsClassifier() 函数
@@ -54,7 +69,7 @@ def analysis_KNeighborsClassifier():
     # 准备forget数据集，数据越多越准确
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.make_forge()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
 
     # 邻居数越少，决策边界越受每一个数据的特性影响；
     # 邻居数越大，决策边界越受所有数据的平均特性影响，即决策边界会越平滑。
@@ -84,6 +99,7 @@ def analysis_KNeighborsClassifier():
     # axes[0].legend(loc = 10)
     # axes[0].legend(loc = 11)  # 没有这个位置
 
+
 # 以n_neighbors为自变量，对比训练集精度和测试集精度
 def analysis_ModelComplexity():
     from sklearn.model_selection import train_test_split
@@ -111,7 +127,6 @@ def analysis_ModelComplexity():
     plt.suptitle("图2-7：以n_neighbors为自变量，对比训练集精度和测试集精度")
 
 
-
 # 3) K近邻回归
 def compare_KNeighborsRegressor():
     # 左边第1个数据预测值变化较大
@@ -124,7 +139,7 @@ def compare_KNeighborsRegressor():
 def fit_KNeighborsRegressor():
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.make_wave(n_samples = 40)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
     from sklearn.neighbors import KNeighborsRegressor
     for n_neighbors in [1, 3, 5, 7]:
         regress = KNeighborsRegressor(n_neighbors = n_neighbors).fit(X_train, y_train)
@@ -146,7 +161,7 @@ def fit_KNeighborsRegressor():
 def analysis_KNeighborsRegressor():
     from sklearn.model_selection import train_test_split
     X, y = mglearn.datasets.make_wave(n_samples = 40)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = config.seed)
     fig, axes = plt.subplots(2, 3, figsize = (15, 8))
     line = np.linspace(-3, 3, 1000).reshape(-1, 1)
     print(line.data.shape)
@@ -169,32 +184,30 @@ def analysis_KNeighborsRegressor():
 
 if __name__ == "__main__":
     # 1) k近邻分类对forge数据集的预测效果
-    compare_NeighborsNumber()
+    # compare_NeighborsNumber()
 
     # 训练K近邻分类模型
-    fit_KNeighborsClassifier()
+    # fit_KNeighborsClassifier()
 
     # 2) 分析 KNeighborsClassifier() 函数
     # 不同n_neighbors值的K近邻模型的决策边界
-    analysis_KNeighborsClassifier()
+    # analysis_KNeighborsClassifier()
 
     # 以n_neighbors为自变量，对比训练集精度和测试集精度
-    analysis_ModelComplexity()
+    # analysis_ModelComplexity()
 
     # 3) K近邻回归
     # K近邻回归效果比较
     # 不同n_neighbors值的K近邻回归模型对wave数据集的预测结果
-    compare_KNeighborsRegressor()
+    # compare_KNeighborsRegressor()
 
     # K近邻回归的训练
-    fit_KNeighborsRegressor()
+    # fit_KNeighborsRegressor()
 
     # 4) 分析 KNeighborsRegressor() 函数
     analysis_KNeighborsRegressor()
 
-    import winsound
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    import tools
+
+    tools.beep_end()
+    tools.show_figures()
