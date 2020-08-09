@@ -15,7 +15,7 @@
 """
 
 # Chap2 监督学习
-import graphviz
+import config
 import matplotlib.pyplot as plt
 import mglearn
 import sklearn
@@ -23,14 +23,9 @@ import numpy as np
 import pandas as pd
 
 
-
-# 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
-
-
 # 2.3.5. 决策树
 
-def plot_feature_importances_cancer(model, dataset):
+def plot_feature_importance_cancer(model, dataset):
     n_features = dataset.data.shape[1]
     plt.barh(range(n_features), model.feature_importances_, align = 'center')
     plt.yticks(np.arange(n_features), dataset.feature_names)
@@ -56,15 +51,16 @@ def draw_decision_tree():
 #       https://stackoverflow.com/questions/43321394/what-is-random-state-parameter-in-scikit-learn-tsne
 #       https://scikit-learn.org/stable/modules/tree.html#tree
 def train_decision_tree_with_iris():
+    import graphviz
     from sklearn.model_selection import train_test_split
     iris = sklearn.datasets.load_iris()
     X_train, X_test, y_train, y_test = train_test_split(
-            iris.data, iris.target, stratify = iris.target, random_state = 42)
+            iris.data, iris.target, stratify = iris.target, random_state = config.seed)
     from sklearn.tree import DecisionTreeClassifier
     from sklearn.tree import export_graphviz
     # max_depth=2，4 时，测试集的精度最高，但是max_depth=4时训练集的精度过高（有过拟合的危险），因此建议选择2。
     for max_depth in [1, 2, 3, 4, 9]:
-        tree = DecisionTreeClassifier(random_state = 0, max_depth = max_depth)
+        tree = DecisionTreeClassifier(random_state = config.seed, max_depth = max_depth)
         tree.fit(X_train, y_train)
 
         print('=' * 20)
@@ -74,7 +70,7 @@ def train_decision_tree_with_iris():
 
         print('Feature importance:\n{}'.format(tree.feature_importances_))
         plt.figure()
-        plot_feature_importances_cancer(tree, iris)
+        plot_feature_importance_cancer(tree, iris)
         plt.suptitle("-- Decision Tree max_depth = {} --".format(max_depth))
 
         # 输出决策树到文件中，用于后期分析
@@ -91,21 +87,23 @@ def train_decision_tree_with_iris():
         pass
     pass
 
+
 # 使用决策树算法处理 cancer 数据集
 # 对树预剪枝，从而控制树的深度，可以防止过拟合，增加测试集的精度
 # Scikit-Learn只实现了“预剪枝”，没有实现“后剪枝”。
 def train_decision_tree_with_cancer():
+    import graphviz
     # 完美地记住训练数据的所有标签，但是测试精度比线性模型要低，说明过拟合了。
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
     X_train, X_test, y_train, y_test = train_test_split(
-            cancer.data, cancer.target, stratify = cancer.target, random_state = 42)
+            cancer.data, cancer.target, stratify = cancer.target, random_state = config.seed)
 
     from sklearn.tree import DecisionTreeClassifier
     from sklearn.tree import export_graphviz
     # max_depth=4,5 时，测试集的精度最高，但是max_depth=5时训练集的精度过高（有过拟合的危险），因此建议选择4。
     for max_depth in [1, 3, 4, 5, 6, 9]:
-        tree = DecisionTreeClassifier(random_state = 0, max_depth = max_depth)
+        tree = DecisionTreeClassifier(random_state = config.seed, max_depth = max_depth)
         tree.fit(X_train, y_train)
 
         print('=' * 20)
@@ -115,13 +113,14 @@ def train_decision_tree_with_cancer():
 
         print('Feature importance:\n{}'.format(tree.feature_importances_))
         plt.figure()
-        plot_feature_importances_cancer(tree, cancer)
+        plot_feature_importance_cancer(tree, cancer)
         plt.suptitle("-- Decision Tree max_depth = {} --".format(max_depth))
 
         # 输出决策树到文件中，用于后期分析
         out_file = 'tree_{}.dot'.format(max_depth)
         export_graphviz(tree, out_file = out_file, impurity = False, filled = True,
-                        feature_names = cancer.feature_names, class_names = list(cancer.target_names))
+                        feature_names = cancer.feature_names,
+                        class_names = list(cancer.target_names))
 
         # 打开文件中保存的决策树，并且显示为图形用于分析
         with open(out_file) as f:
@@ -132,20 +131,22 @@ def train_decision_tree_with_cancer():
         pass
     pass
 
+
 # 4) 树的特征重要性
 def plot_decision_tree_important_feature():
-    # 将特征的重要性进行可视化，了解哪个特征最重要，哪些是重要特征，哪些特征没有被考虑。
+    # 将特征的重要性进行可视化，了解哪个特征最重要，哪些特征非常重要，哪些特征没有被考虑。
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
     X_train, X_test, y_train, y_test = train_test_split(
-            cancer.data, cancer.target, stratify = cancer.target, random_state = 42)
+            cancer.data, cancer.target, stratify = cancer.target, random_state = config.seed)
 
     from sklearn.tree import DecisionTreeClassifier
-    tree = DecisionTreeClassifier(max_depth = 4, random_state = 0)
+    tree = DecisionTreeClassifier(max_depth = 4, random_state = config.seed)
     tree.fit(X_train, y_train)
     print('Feature importance:\n{}'.format(tree.feature_importances_))
-    plot_feature_importances_cancer(tree, cancer)
+    plot_feature_importance_cancer(tree, cancer)
     plt.suptitle("图2-28：在 cancer 数据集上学到的决策树的特征重要性")
+
 
 # 决策树学习非单调关系的数据集
 def plot_tree_not_monotone():
@@ -185,7 +186,8 @@ def fit_decision_tree_regression():
 
     from sklearn.tree import DecisionTreeRegressor
     from sklearn.linear_model import LinearRegression
-    tree_regressor = DecisionTreeRegressor().fit(X_train, y_train)
+    tree_regressor = DecisionTreeRegressor()
+    tree_regressor.fit(X_train, y_train)
     linear_regression = LinearRegression().fit(X_train, y_train)
 
     # 为ram_prices.date增加一维数据，即如果是一维的数据，就变成了二维的数据
@@ -228,11 +230,8 @@ if __name__ == "__main__":
     # show_ram_prices_log_scale()
 
     # 图2-32：线性模型和回归树对RAM价格数据的预测结果对比
-    fit_decision_tree_regression()
+    # fit_decision_tree_regression()
 
-    import winsound
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    import tools
+    tools.beep_end()
+    tools.show_figures()
