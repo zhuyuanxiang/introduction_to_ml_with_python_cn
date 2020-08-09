@@ -15,6 +15,7 @@
 """
 
 # Chap2 监督学习
+import config
 import random
 from math import log2, sqrt
 
@@ -23,11 +24,8 @@ import mglearn
 import numpy as np
 import sklearn
 
-# 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
 
-
-def plot_feature_importances_cancer(model, dataset):
+def plot_feature_importance_cancer(model, dataset):
     n_features = dataset.data.shape[1]
     plt.barh(range(n_features), model.feature_importances_, align = 'center')
     plt.yticks(np.arange(n_features), dataset.feature_names)
@@ -50,13 +48,13 @@ def plot_feature_importances_cancer(model, dataset):
 #   - 如果是1，那么划分时无法选择对哪个特征进行测试，就只能对随机选择某个特征搜索不同的阈值。可以降低过拟合。
 #   - 如果是最大值，那么生成的树将会非常相似。
 #   - 默认值。分类问题是sqrt(n_features)；回归问题是n_features。
-# random_state：只是个随机数生成种子，保证每次生成的结果是一样的
+# random_state：只是个随机数生成种子，保证每次生成一样的结果
 # n_jobs表示可以使用的CPU的个数。-1表示全部使用。默认值是1。
 def plot_decision_tree_and_forest():
     from sklearn.datasets import make_moons
     from sklearn.model_selection import train_test_split
-    X, y = make_moons(n_samples = 100, noise = 0.25, random_state = 3)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify = y, random_state = 42)
+    X, y = make_moons(n_samples = 100, noise = 0.25, random_state = config.seed)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify = y, random_state = config.seed)
 
     from sklearn.ensemble import RandomForestClassifier
     forest = RandomForestClassifier(n_estimators = 5, random_state = 2, n_jobs = 3)
@@ -80,7 +78,8 @@ def plot_decision_tree_and_forest():
 def random_forest_max_feature_cancer():
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,
+                                                        random_state = config.seed)
 
     # 训练随机森林
     print('=' * 20)
@@ -93,7 +92,8 @@ def random_forest_max_feature_cancer():
                            round(max_feature_number * 0.6),
                            max_feature_number]:
         # max_features不允许是浮点数
-        forest = RandomForestClassifier(n_estimators = 5, max_features = feature_number, random_state = 0, n_jobs = 3)
+        forest = RandomForestClassifier(n_estimators = 5, max_features = feature_number,
+                                        random_state = config.seed, n_jobs = 3)
         forest.fit(X_train, y_train)
 
         # 评价随机森林
@@ -110,13 +110,15 @@ def random_forest_cancer_dataset():
     # 准备数据
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,
+                                                        random_state = config.seed)
 
     # 训练随机森林
     from sklearn.ensemble import RandomForestClassifier
-    # forest = RandomForestClassifier(n_estimators = 100, random_state = 0, n_jobs = 3)
+    # forest = RandomForestClassifier(n_estimators = 100, random_state = config.seed, n_jobs = 3)
     forest = RandomForestClassifier(
-            n_estimators = 100, random_state = 0, max_features = len(cancer.feature_names), n_jobs = 3)
+            n_estimators = 100, random_state = config.seed,
+            max_features = len(cancer.feature_names), n_jobs = 3)
     forest.fit(X_train, y_train)
 
     # 评价随机森林
@@ -127,12 +129,12 @@ def random_forest_cancer_dataset():
 
     # 绘制随机森林的特征重要性
     plt.figure()
-    plot_feature_importances_cancer(forest, cancer)
+    plot_feature_importance_cancer(forest, cancer)
     plt.title("图2-34：拟合 Cancer 数据集得到的随机森林的特征重要性")
 
     # # 训练决策树
     from sklearn.tree import DecisionTreeClassifier
-    tree = DecisionTreeClassifier(random_state = 0)
+    tree = DecisionTreeClassifier(random_state = config.seed)
     tree.fit(X_train, y_train)
 
     # # 评价决策树
@@ -143,14 +145,14 @@ def random_forest_cancer_dataset():
 
     # # 绘制决策树的重要性
     plt.figure()
-    plot_feature_importances_cancer(tree, cancer)
+    plot_feature_importance_cancer(tree, cancer)
     plt.title('拟合 Cancer 数据集得到的决策树的特征重要性')
 
     # 使用随机森林的训练结果，从100个决策树中随机选择其中的7个决策树，绘制决策树的特征重要性
     for i in range(7):
         tree = random.choice(forest.estimators_)
         plt.figure()
-        plot_feature_importances_cancer(tree, cancer)
+        plot_feature_importance_cancer(tree, cancer)
         plt.title('从随机森林的100个决策树中随机选择的第{}个决策树的特征重要性'.format(i))
     pass
 
@@ -171,10 +173,11 @@ def random_forest_cancer_dataset():
 def plot_gbdt():
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,
+                                                        random_state = config.seed)
 
     from sklearn.ensemble import GradientBoostingClassifier
-    gbdt = GradientBoostingClassifier(random_state = 0)
+    gbdt = GradientBoostingClassifier(random_state = config.seed)
     gbdt.fit(X_train, y_train)
 
     print('=' * 20)
@@ -183,7 +186,7 @@ def plot_gbdt():
     print('Test set score: {:.3f}'.format(gbdt.score(X_test, y_test)))
 
     plt.figure()
-    plot_feature_importances_cancer(gbdt, cancer)
+    plot_feature_importance_cancer(gbdt, cancer)
     plt.title("图2-34：拟合 Cancer 数据集得到的GBDT的特征重要性")
 
 
@@ -191,11 +194,12 @@ def plot_gbdt():
 def plot_gbdt_preprunning_max_depth():
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,
+                                                        random_state = config.seed)
 
     from sklearn.ensemble import GradientBoostingClassifier
     max_depth = 1
-    gbdt = GradientBoostingClassifier(random_state = 0, max_depth = max_depth)
+    gbdt = GradientBoostingClassifier(random_state = config.seed, max_depth = max_depth)
     gbdt.fit(X_train, y_train)
 
     print('=' * 20)
@@ -204,9 +208,8 @@ def plot_gbdt_preprunning_max_depth():
     print('Training set score: {:.3f}'.format(gbdt.score(X_train, y_train)))
     print('Test set score: {:.3f}'.format(gbdt.score(X_test, y_test)))
 
-
     plt.figure()
-    plot_feature_importances_cancer(gbdt, cancer)
+    plot_feature_importance_cancer(gbdt, cancer)
     plt.title("图2-34：拟合 Cancer 数据集得到的预剪枝（控制深度）GBDT的特征重要性")
 
 
@@ -216,11 +219,12 @@ def plot_gbdt_preprunning_max_depth():
 def plot_gbdt_preprunning_learning_rate():
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,
+                                                        random_state = config.seed)
 
     from sklearn.ensemble import GradientBoostingClassifier
     learning_rate = 0.01
-    gbdt = GradientBoostingClassifier(random_state = 0, learning_rate = learning_rate)
+    gbdt = GradientBoostingClassifier(random_state = config.seed, learning_rate = learning_rate)
     gbdt.fit(X_train, y_train)
 
     print('=' * 20)
@@ -230,7 +234,7 @@ def plot_gbdt_preprunning_learning_rate():
     print('Test set score: {:.3f}'.format(gbdt.score(X_test, y_test)))
 
     plt.figure()
-    plot_feature_importances_cancer(gbdt, cancer)
+    plot_feature_importance_cancer(gbdt, cancer)
     plt.title("图2-34：拟合 Cancer 数据集得到的预剪枝（控制学习率）GBDT的特征重要性")
 
 
@@ -249,14 +253,11 @@ if __name__ == "__main__":
     # plot_gbdt()
 
     # 降低深度，加强预剪枝
-    plot_gbdt_preprunning_max_depth()
+    # plot_gbdt_preprunning_max_depth()
 
     # 降低学习率，加强预剪枝
-    plot_gbdt_preprunning_learning_rate()
+    # plot_gbdt_preprunning_learning_rate()
 
-    import winsound
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    import tools
+    tools.beep_end()
+    tools.show_figures()
