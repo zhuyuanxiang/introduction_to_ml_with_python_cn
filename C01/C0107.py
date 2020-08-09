@@ -13,12 +13,7 @@
 @Reference  :   《Python机器学习基础教程》, Ch0107，P11
 @Desc       :   引言。第一个应用：鸢尾花分类
 """
-import matplotlib.pyplot as plt
-import mglearn
-import numpy as np
-
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
-
+import config
 import mglearn
 import numpy as np
 import pandas as pd
@@ -43,7 +38,7 @@ def train_iris_segment():  # 在PyCharm中使用Alt+Shift+E一条条语句在Pyt
 
     # 1.7.2. 准备数据
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(
-            iris_dataset['data'], iris_dataset['target'], random_state = 0)
+            iris_dataset['data'], iris_dataset['target'], random_state = config.seed)
     print('X_train shape: {}'.format(X_train.shape))
     print('y_train shape: {}'.format(y_train.shape))
     print('X_test shape: {}'.format(X_test.shape))
@@ -82,7 +77,7 @@ def train_iris_segment():  # 在PyCharm中使用Alt+Shift+E一条条语句在Pyt
 def train_iris_completion():
     iris_dataset = sklearn.datasets.load_iris()
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(
-            iris_dataset['data'], iris_dataset['target'], random_state = 0)
+            iris_dataset['data'], iris_dataset['target'], random_state = config.seed)
     model = sklearn.neighbors.KNeighborsClassifier(n_neighbors = 1)
     model.fit(X_train, y_train)  # 模型训练
     print('Test set score: {:.2f}'.format(model.score(X_test, y_test)))
@@ -95,9 +90,7 @@ if __name__ == "__main__":
 
     # 鸢尾花分类的完整运行
     train_iris_completion()
-    import winsound
 
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    import tools
+    tools.beep_end()
+    tools.show_figures()
