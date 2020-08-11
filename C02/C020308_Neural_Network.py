@@ -19,7 +19,6 @@ import graphviz
 import matplotlib.pyplot as plt
 import numpy as np
 import mglearn
-import sklearn
 from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
@@ -80,7 +79,7 @@ def tune_neural_network_parameter():
     """神经网络的参数调整"""
     # 通过对比，得出结论。
     # 单元数越多，决策边界越趋向曲线；
-    # 隐层数越多，决策边界的弯曲越多；
+    # 隐层数越多，决策边界的拐点越多；
     # 激活函数为relu时，决策边界越趋向于直线；激活函数为tanh时，决策边界越趋向于曲线。
     X, y = make_moons(n_samples = 100, noise = 0.25, random_state = config.seed)
     X_train, X_test, y_train, y_test = train_test_split(X, y, stratify = y,

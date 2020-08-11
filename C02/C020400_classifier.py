@@ -14,13 +14,12 @@
 @Desc       :   监督学习算法。分类器的不确定度估计
 """
 # Chap2 监督学习
+import config
 import numpy as np
 import matplotlib.pyplot as plt
 import mglearn
-import sklearn
 
-# 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
+from tools import beep_end, show_figures
 
 
 # 2.4. 分类器的不确定度估计（预测的置信程度）
@@ -36,7 +35,8 @@ def toy_data():
 
     X, y = make_circles()
     y_named = np.array(['blue', 'red'])[y]
-    X_train, X_test, y_train_named, y_test_named, y_train, y_test = train_test_split(X, y_named, y, random_state = 0)
+    X_train, X_test, y_train_named, y_test_named, y_train, y_test = train_test_split(X, y_named, y,
+                                                                                     random_state = config.seed)
 
     plt.figure()
     plt.title("默认circle数据集")
@@ -45,7 +45,8 @@ def toy_data():
 
     X, y = make_circles(noise = 0.25, factor = 0.5, random_state = 1)
     y_named = np.array(['blue', 'red'])[y]
-    X_train, X_test, y_train_named, y_test_named, y_train, y_test = train_test_split(X, y_named, y, random_state = 0)
+    X_train, X_test, y_train_named, y_test_named, y_train, y_test = train_test_split(X, y_named, y,
+                                                                                     random_state = config.seed)
 
     plt.figure()
     plt.title("有噪声的circle数据集")
@@ -61,18 +62,19 @@ def decision_function():
     from sklearn.model_selection import train_test_split
     X, y = make_circles(noise = 0.25, factor = 0.5, random_state = 1)
     y_named = np.array(['blue', 'red'])[y]
-    X_train, X_test, y_train_named, y_test_named, y_train, y_test = train_test_split(X, y_named, y, random_state = 0)
+    X_train, X_test, y_train_named, y_test_named, y_train, y_test = train_test_split(X, y_named, y,
+                                                                                     random_state = config.seed)
 
     # 构建梯度提升模型
     from sklearn.ensemble import GradientBoostingClassifier
-    gbdt = GradientBoostingClassifier(random_state = 0)
+    gbdt = GradientBoostingClassifier(random_state = config.seed)
     gbdt.fit(X_train, y_train_named)
 
     # 2.4.1. 决策函数
     print('测试集的形状：{}'.format(X_test.shape))
     decision_function_values = gbdt.decision_function(X_test)
-    # 二分类问题的决策函数是一维数据是历史原因造成的。
-    # ToDo：什么历史原因？
+    # 二分类问题的决策函数是一维数据
+    # ToDo：什么历史原因造成的？
     print('决策函数的形状：{}'.format(decision_function_values.shape))
     print('决策函数计算测试集的输出值：\n{}'.format(decision_function_values))
     print('决策函数计算测试集的输出值经过阈值判断的结果：\n{}'.format(decision_function_values > 0))
@@ -92,9 +94,11 @@ def decision_function():
 
     fig, axes = plt.subplots(1, 2, figsize = (13, 5))
 
-    mglearn.tools.plot_2d_separator(gbdt, X, ax = axes[0], alpha = .4, fill = True, cm = mglearn.cm2)
+    mglearn.tools.plot_2d_separator(gbdt, X, ax = axes[0], alpha = .4, fill = True,
+                                    cm = mglearn.cm2)
 
-    scores_image = mglearn.tools.plot_2d_scores(gbdt, X, ax = axes[1], alpha = .4, cm = mglearn.ReBl)
+    scores_image = mglearn.tools.plot_2d_scores(gbdt, X, ax = axes[1], alpha = .4,
+                                                cm = mglearn.ReBl)
 
     from mglearn import discrete_scatter
     for ax in axes:
@@ -103,7 +107,7 @@ def decision_function():
         ax.set_xlabel('Feature 0')
         ax.set_ylabel('Feature 1')
 
-    cbar = plt.colorbar(scores_image, ax = axes.tolist())
+    plt.colorbar(scores_image, ax = axes.tolist())
     axes[0].legend(['Test class 0', 'Test class 1',
                     'Train Class 0', 'Train Class 1'], ncol = 4, loc = (.1, 1.1))
     plt.title("图2-55 梯度提升模型在一个二维圆数据集上的决策边界（左）和决策函数（右）")
@@ -112,7 +116,7 @@ def decision_function():
 # 2.4.2. 预测概率
 # 分类器对于大部分点都给出了相对较高的置信度。
 # 不确定度的大小反映了数据通过模型和参数的计算的输出结果的不确定度。
-# 过拟合更强的模型会做出置信度更高的预测，即使可能是错的。
+# 过拟合更强的模型会做出置信度更高的预测，即使可能有错。
 # 过拟合更弱的模型，即复杂度更低的模型，对预测的结果的不确定度更大。
 # 如果模型给出的不确定度符合实际的情况，那么这个模型就是校正（calibrated）模型。
 def predict_probability():
@@ -123,11 +127,11 @@ def predict_probability():
 
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train_named, y_test_named, y_train, y_test = train_test_split(
-            X, y_named, y, random_state = 0)
+            X, y_named, y, random_state = config.seed)
 
     # 构建梯度提升模型
     from sklearn.ensemble import GradientBoostingClassifier
-    gbdt = GradientBoostingClassifier(random_state = 0)
+    gbdt = GradientBoostingClassifier(random_state = config.seed)
     gbdt.fit(X_train, y_train_named)
 
     predict_proba = gbdt.predict_proba(X_test)
@@ -154,7 +158,8 @@ def predict_probability():
     # 预测概率图中的边界更加清晰。
     fig, axes = plt.subplots(1, 2, figsize = (13, 5))
 
-    mglearn.tools.plot_2d_separator(gbdt, X, ax = axes[0], alpha = .4, fill = True, cm = mglearn.cm2)
+    mglearn.tools.plot_2d_separator(gbdt, X, ax = axes[0], alpha = .4, fill = True,
+                                    cm = mglearn.cm2)
     scores_image = mglearn.tools.plot_2d_scores(
             gbdt, X, ax = axes[1], alpha = .5, cm = mglearn.ReBl, function = 'predict_proba')
 
@@ -165,7 +170,7 @@ def predict_probability():
         ax.set_xlabel('Feature 0')
         ax.set_ylabel('Feature 1')
 
-    cbar = plt.colorbar(scores_image, ax = axes.tolist())
+    plt.colorbar(scores_image, ax = axes.tolist())
     axes[0].legend(['Test class 0', 'Test class 1',
                     'Train Class 0', 'Train Class 1'], ncol = 4, loc = (.1, 1.1))
     plt.title("图2-56 梯度提升模型在一个二维圆数据集上的决策边界（左）和预测概率（右）")
@@ -179,10 +184,11 @@ def multi_classes():
     iris = load_iris()
 
     from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, random_state = 42)
+    X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target,
+                                                        random_state = config.seed)
 
     from sklearn.ensemble import GradientBoostingClassifier
-    gbdt = GradientBoostingClassifier(learning_rate = 0.01, random_state = 0)
+    gbdt = GradientBoostingClassifier(learning_rate = 0.01, random_state = config.seed)
     gbdt.fit(X_train, y_train)
     print('=' * 20)
     print("使用 GBDT 对 iris 数据集进行学习")
@@ -256,8 +262,10 @@ def multi_classes():
     print(predict_result[:10])
 
     print('-' * 20)
-    print("决策函数的输出值中的最大项与测试数据集的预测结果是否相等？", np.all(log_reg.classes_[argmax_decision_func] == predict_result))
-    print("预测概率的输出值中的最大项与测试数据集的预测结果是否相等？", np.all(log_reg.classes_[argmax_predict_prob] == predict_result))
+    print("决策函数的输出值中的最大项与测试数据集的预测结果是否相等？",
+          np.all(log_reg.classes_[argmax_decision_func] == predict_result))
+    print("预测概率的输出值中的最大项与测试数据集的预测结果是否相等？",
+          np.all(log_reg.classes_[argmax_predict_prob] == predict_result))
 
     pass
 
@@ -275,10 +283,5 @@ if __name__ == "__main__":
     # 2.4.3. 多分类问题的不确定度
     multi_classes()
 
-    import winsound
-
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    beep_end()
+    show_figures()
