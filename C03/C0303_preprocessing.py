@@ -14,12 +14,16 @@
 @Desc       :   无监督学习算法。数据预处理和缩放。
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
 import mglearn
+import numpy as np
 
 # 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
+from config import seed
+from tools import beep_end
+from tools import show_figures
+
+np.set_printoptions(precision=3, suppress=True, threshold=np.inf)
 
 
 # 3.3. 预处理和缩放
@@ -43,7 +47,7 @@ def min_max_scaler():
     from sklearn.datasets import load_breast_cancer
     from sklearn.model_selection import train_test_split
     cancer = load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state = 1)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state=1)
 
     # 导入预处理器
     from sklearn.preprocessing import MinMaxScaler
@@ -59,41 +63,41 @@ def min_max_scaler():
     print("训练数据集变换前的形状：", X_train.shape)
     print("训练数据集变换后的形状：", X_train_scaled.shape)
     print('-' * 20)
-    print('训练数据集变换前每一个特征的最小值:\n{}'.format(X_train.min(axis = 0)))
+    print('训练数据集变换前每一个特征的最小值:\n{}'.format(X_train.min(axis=0)))
     print('-' * 20)
-    print('训练数据集变换前每一个特征的最大值:\n{}'.format(X_train.max(axis = 0)))
+    print('训练数据集变换前每一个特征的最大值:\n{}'.format(X_train.max(axis=0)))
     print('-' * 20)
-    print('训练数据集变换后每一个特征的最小值:\n{}'.format(X_train_scaled.min(axis = 0)))
+    print('训练数据集变换后每一个特征的最小值:\n{}'.format(X_train_scaled.min(axis=0)))
     print('-' * 20)
-    print('训练数据集变换后每一个特征的最大值:\n{}'.format(X_train_scaled.max(axis = 0)))
+    print('训练数据集变换后每一个特征的最大值:\n{}'.format(X_train_scaled.max(axis=0)))
 
     X_test_scaled = scaler.transform(X_test)
     print('=' * 20)
     print("测试数据集变换前的形状：", X_test.shape)
     print("测试数据集变换后的形状：", X_test_scaled.shape)
     print('-' * 20)
-    print('测试数据集变换前每一个特征的最小值:\n{}'.format(X_test.min(axis = 0)))
+    print('测试数据集变换前每一个特征的最小值:\n{}'.format(X_test.min(axis=0)))
     print('-' * 20)
-    print('测试数据集变换前每一个特征的最大值:\n{}'.format(X_test.max(axis = 0)))
+    print('测试数据集变换前每一个特征的最大值:\n{}'.format(X_test.max(axis=0)))
     print('-' * 20)
-    print('测试数据集变换后每一个特征的最小值:\n{}'.format(X_test_scaled.min(axis = 0)))
+    print('测试数据集变换后每一个特征的最小值:\n{}'.format(X_test_scaled.min(axis=0)))
     print('-' * 20)
-    print('测试数据集变换后每一个特征的最大值:\n{}'.format(X_test_scaled.max(axis = 0)))
+    print('测试数据集变换后每一个特征的最大值:\n{}'.format(X_test_scaled.max(axis=0)))
 
 
 # 3.3.3. 对训练数据和测试数据进行相同的缩放
 def min_max_blob_data():
     from sklearn.datasets import make_blobs
     from sklearn.model_selection import train_test_split
-    X, _ = make_blobs(n_samples = 50, centers = 5, random_state = 4, cluster_std = 2)
-    X_train, X_test = train_test_split(X, random_state = 5, test_size = .1)
+    X, _ = make_blobs(n_samples=50, centers=5, random_state=4, cluster_std=2)
+    X_train, X_test = train_test_split(X, random_state=5, test_size=.1)
 
-    fig, axes = plt.subplots(1, 3, figsize = (13, 4))
+    fig, axes = plt.subplots(1, 3, figsize=(13, 4))
     # 绘制原始的训练集和测试集
-    axes[0].scatter(X_train[:, 0], X_train[:, 1], c = 'blue', s = 60, label = '训练数据集')
-    axes[0].scatter(X_test[:, 0], X_test[:, 1], c = 'red', s = 60, label = '测试数据集', marker = '^')
+    axes[0].scatter(X_train[:, 0], X_train[:, 1], c='blue', s=60, label='训练数据集')
+    axes[0].scatter(X_test[:, 0], X_test[:, 1], c='red', s=60, label='测试数据集', marker='^')
     axes[0].set_title('原始数据')
-    axes[0].legend(loc = 'upper left')
+    axes[0].legend(loc='upper left')
 
     # 绘制MinMaxSccaler()缩放的训练集和测试集
     # 导入预处理器
@@ -105,17 +109,17 @@ def min_max_blob_data():
 
     X_train_scaled = scaler.transform(X_train)
     X_test_scaled = scaler.transform(X_test)
-    axes[1].scatter(X_train_scaled[:, 0], X_train_scaled[:, 1], c = 'blue', s = 60, label = '训练数据集')
-    axes[1].scatter(X_test_scaled[:, 0], X_test_scaled[:, 1], c = 'red', s = 60, label = '测试数据集', marker = '^')
+    axes[1].scatter(X_train_scaled[:, 0], X_train_scaled[:, 1], c='blue', s=60, label='训练数据集')
+    axes[1].scatter(X_test_scaled[:, 0], X_test_scaled[:, 1], c='red', s=60, label='测试数据集', marker='^')
     axes[1].set_title('正确缩放后的数据')
 
     # 对X_test训练，对测试数据单独缩放（这样的缩放方式是错误的），破坏了训练数据与测试数据的相关性
     test_scaler = MinMaxScaler()
     test_scaler.fit(X_test)
     X_test_scaled_badly = test_scaler.transform(X_test)
-    axes[2].scatter(X_train_scaled[:, 0], X_train_scaled[:, 1], c = 'blue', s = 60, label = '训练数据集')
-    axes[2].scatter(X_test_scaled_badly[:, 0], X_test_scaled_badly[:, 1], c = 'red', s = 60, label = '测试数据集',
-                    marker = '^')
+    axes[2].scatter(X_train_scaled[:, 0], X_train_scaled[:, 1], c='blue', s=60, label='训练数据集')
+    axes[2].scatter(X_test_scaled_badly[:, 0], X_test_scaled_badly[:, 1], c='red', s=60, label='测试数据集',
+                    marker='^')
     axes[2].set_title('错误缩放后的数据')
 
     plt.suptitle("图3-2：原始数据（左），同时缩放的数据（中），分别缩放的数据（右）")
@@ -128,10 +132,10 @@ def preprocess_data_svm():
     from sklearn.datasets import load_breast_cancer
     from sklearn.model_selection import train_test_split
     cancer = load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state=seed)
 
     from sklearn.svm import SVC
-    svm = SVC(C = 100, gamma = 'auto')
+    svm = SVC(C=100, gamma='auto')
     svm.fit(X_train, y_train)
     print('=' * 20)
     print("-- 没有预处理的数据通过SVC学习 --")
@@ -172,10 +176,6 @@ if __name__ == "__main__":
 
     # SVM对数据缩放比较敏感
     # preprocess_data_svm()
-    import winsound
 
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    beep_end()
+    show_figures()
