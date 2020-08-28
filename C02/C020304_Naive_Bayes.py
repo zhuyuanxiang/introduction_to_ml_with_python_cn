@@ -15,11 +15,10 @@
 """
 
 # Chap2 监督学习
-import config
 import numpy as np
 
 # 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
+np.set_printoptions(precision=3, suppress=True, threshold=np.inf)
 
 # 2.3.4. 朴素贝叶斯分类器
 # BernoulliNB分类器计算每个类别中每个特征不为0的元素个数
@@ -56,10 +55,10 @@ print('X[y == 0]:')
 print(X[y == 0])
 
 print('-' * 20)
-print('X[y == 0].sum(axis = 0)', X[y == 0].sum(axis = 0))
+print('X[y == 0].sum(axis = 0)', X[y == 0].sum(axis=0))
 
 print('-' * 20)
-print('X[y == 0].sum(axis = 1)', X[y == 0].sum(axis = 1))
+print('X[y == 0].sum(axis = 1)', X[y == 0].sum(axis=1))
 
 # 没有第3维的数据
 # print('-' * 20)
@@ -71,10 +70,10 @@ print('X[y == 1]:')
 print(X[y == 1])
 
 print('-' * 20)
-print('X[y == 1].sum(axis = 0)', X[y == 1].sum(axis = 0))
+print('X[y == 1].sum(axis = 0)', X[y == 1].sum(axis=0))
 
 print('-' * 20)
-print('X[y == 1].sum(axis = 1)', X[y == 1].sum(axis = 1))
+print('X[y == 1].sum(axis = 1)', X[y == 1].sum(axis=1))
 
 print('=' * 20)
 
@@ -82,11 +81,13 @@ counts = {}
 for label in np.unique(y):
     # 对每个类别进行遍历
     # 计算（求和）每个特征中1的个数
-    counts[label] = X[y == label].sum(axis = 0)
+    counts[label] = X[y == label].sum(axis=0)
     pass
 print('Feature counts:{}\t'.format(counts))
 
-import tools
+from tools import beep_end
+from tools import show_figures
 
-tools.beep_end()
-tools.show_figures()
+beep_end()
+show_figures()
+
