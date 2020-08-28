@@ -17,13 +17,14 @@ import matplotlib.pyplot as plt
 import mglearn
 import numpy as np
 
-# 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf)
-
-
+from config import seed
 # 3.4. 降维、特征提取与流形学习
 # 3.4.1. 主成分分析：旋转数据集的方法，旋转后的特征之间在统计上不相关。
 # 按照方差的大小，顺序选择成分。
+from tools import beep_end
+from tools import show_figures
+
+
 def plot_pca_illustration():
     mglearn.plots.plot_pca_illustration()
     plt.suptitle("图3-3：用PCA做数据变换")
@@ -39,19 +40,19 @@ def feature_histogram_cancer():
     benign = cancer.data[cancer.target == 1]
 
     # 乳腺癌数据的特征直方图，可以发现许多数据没有可分性
-    fig, axes = plt.subplots(5, 2, figsize = (10, 10))
+    fig, axes = plt.subplots(5, 2, figsize=(10, 10))
     ax = axes.ravel()
     for i in range(10):
-        _, bins = np.histogram(cancer.data[:, i], bins = 50)
+        _, bins = np.histogram(cancer.data[:, i], bins=50)
         print('-' * 20)
         print(bins)
-        ax[i].hist(malignant[:, i], bins = bins, color = 'blue', alpha = .5)
-        ax[i].hist(benign[:, i], bins = bins, color = 'red', alpha = .5)
+        ax[i].hist(malignant[:, i], bins=bins, color='blue', alpha=.5)
+        ax[i].hist(benign[:, i], bins=bins, color='red', alpha=.5)
         ax[i].set_title(cancer.feature_names[i])
         # ax[i].set_yticks((0,100))
     ax[0].set_xlabel('特征量纲')
     ax[0].set_ylabel('频率')
-    ax[0].legend(['malignant', 'benign'], loc = 'best')
+    ax[0].legend(['malignant', 'benign'], loc='best')
     fig.tight_layout()
     plt.suptitle("图3-4：Cancer 数据集中每个类别的特征直方图")
 
@@ -71,29 +72,29 @@ def pca_cancer_standard_scaler_2d():
     cancer_scaled = scaler.transform(cancer.data)
 
     from sklearn.decomposition import PCA
-    pca = PCA(n_components = 2)
+    pca = PCA(n_components=2)
     pca.fit(cancer_scaled)
     cancer_pca = pca.transform(cancer_scaled)
 
-    print('='*20)
+    print('=' * 20)
     print('Cancer 数据集中原始数据的形状: {}'.format(str(cancer_scaled.shape)))
     print('Cancer 数据集中降维数据的形状: {}'.format(str(cancer_pca.shape)))
 
-    plt.figure(figsize = (8, 8))
+    plt.figure(figsize=(8, 8))
     mglearn.discrete_scatter(cancer_pca[:, 0], cancer_pca[:, 1], cancer.target)
-    plt.legend(cancer.target_names, loc = 'best')
+    plt.legend(cancer.target_names, loc='best')
     plt.gca().set_aspect('equal')
     plt.xlabel('第一个主成分')
     plt.ylabel('第二个主成分')
     plt.suptitle("图3-5：利用前两个主成分绘制 Cancer 数据集的二维散点图")
 
-    print('-'*20)
+    print('-' * 20)
     print("PCA 成分的形状: {}".format(pca.components_.shape))
     print("PCA 成分的内容:")
     print(pca.components_)
 
-    plt.matshow(pca.components_, cmap = 'viridis')
-    plt.xticks(range(len(cancer.feature_names)), cancer.feature_names, rotation = 60, ha = 'left')
+    plt.matshow(pca.components_, cmap='viridis')
+    plt.xticks(range(len(cancer.feature_names)), cancer.feature_names, rotation=60, ha='left')
     plt.yticks([0, 1], ['第一个主成分', '第二个主成分'])
     plt.xlabel('特征')
     plt.ylabel('主成分')
@@ -114,40 +115,40 @@ def pca_cancer_standard_scaler_3d():
     cancer_scaled = scaler.transform(cancer.data)
 
     from sklearn.decomposition import PCA
-    pca = PCA(n_components = 3)
+    pca = PCA(n_components=3)
     pca.fit(cancer_scaled)
     cancer_pca = pca.transform(cancer_scaled)
 
-    print('='*20)
+    print('=' * 20)
     print('Cancer 数据集中原始数据的形状: {}'.format(str(cancer_scaled.shape)))
     print('Cancer 数据集中降维数据的形状: {}'.format(str(cancer_pca.shape)))
 
-    figure = plt.figure(figsize = (8, 8))
+    figure = plt.figure(figsize=(8, 8))
     from mpl_toolkits.mplot3d import Axes3D
     ax = Axes3D(figure)
     mask = (cancer.target == 0)
-    ax.scatter(cancer_pca[mask, 0], cancer_pca[mask, 1], cancer_pca[mask, 2], c = 'b', cmap = mglearn.cm2, s = 60)
-    ax.scatter(cancer_pca[~mask, 0], cancer_pca[~mask, 1], cancer_pca[~mask, 2], c = 'r', cmap = mglearn.cm2, s = 60,marker = '^')
+    ax.scatter(cancer_pca[mask, 0], cancer_pca[mask, 1], cancer_pca[mask, 2], c='b', cmap=mglearn.cm2, s=60)
+    ax.scatter(cancer_pca[~mask, 0], cancer_pca[~mask, 1], cancer_pca[~mask, 2], c='r', cmap=mglearn.cm2, s=60,
+               marker='^')
     ax.set_xlabel('第一个主成分')
     ax.set_ylabel('第二个主成分')
     ax.set_zlabel('第三个主成分')
     plt.suptitle("图3-5：利用前三个主成分绘制 Cancer 数据集的三维散点图")
-    plt.legend(cancer.target_names, loc = 'best')
+    plt.legend(cancer.target_names, loc='best')
     # plt.gca().set_aspect('equal')
 
-    print('-'*20)
+    print('-' * 20)
     print("PCA 成分的形状: {}".format(pca.components_.shape))
     print("PCA 成分的内容:")
     print(pca.components_)
 
-    plt.matshow(pca.components_, cmap = 'viridis')
-    plt.xticks(range(len(cancer.feature_names)), cancer.feature_names, rotation = 60, ha = 'left')
-    plt.yticks([0, 1,2], ['第一个主成分', '第二个主成分', '第三个主成分'])
+    plt.matshow(pca.components_, cmap='viridis')
+    plt.xticks(range(len(cancer.feature_names)), cancer.feature_names, rotation=60, ha='left')
+    plt.yticks([0, 1, 2], ['第一个主成分', '第二个主成分', '第三个主成分'])
     plt.xlabel('特征')
     plt.ylabel('主成分')
     plt.colorbar()
     plt.suptitle("图3-6：Cancer 数据集前三个主成分的热图")
-
 
 
 # 2. 特征提取的特征脸
@@ -156,9 +157,9 @@ def pca_cancer_standard_scaler_3d():
 # 某些类别的数据过多，会导致数据偏斜，可以通过限制每个类别的数据量来解决
 def show_original_faces():
     from sklearn.datasets import fetch_lfw_people
-    people = fetch_lfw_people(min_faces_per_person = 20, resize = .7)
+    people = fetch_lfw_people(min_faces_per_person=20, resize=.7)
 
-    print('='*20)
+    print('=' * 20)
     print('人脸数据集中数据形状: {}'.format(people.images.shape))
     print('人脸数据集中类别（人的数目）: {}'.format(len(people.target_names)))
 
@@ -172,7 +173,7 @@ def show_original_faces():
         #     print()
         pass
 
-    fig, axes = plt.subplots(2, 5, figsize = (15, 8), subplot_kw = {'xticks': (), 'yticks': ()})
+    fig, axes = plt.subplots(2, 5, figsize=(15, 8), subplot_kw={'xticks': (), 'yticks': ()})
     for target, image, ax in zip(people.target, people.images, axes.ravel()):
         ax.imshow(image)
         ax.set_title("原始图片：" + people.target_names[target])
@@ -182,10 +183,10 @@ def show_original_faces():
 
 def knn_classify_pca_faces():
     from sklearn.datasets import fetch_lfw_people
-    people = fetch_lfw_people(min_faces_per_person = 20, resize = .7)
+    people = fetch_lfw_people(min_faces_per_person=20, resize=.7)
 
     # 生成一个全0的mask矩阵
-    mask = np.zeros(people.target.shape, dtype = np.bool)
+    mask = np.zeros(people.target.shape, dtype=np.bool)
     for target in np.unique(people.target):
         # 将每个人的前50条数据设置为1，方便取出
         mask[np.where(people.target == target)[0][:50]] = 1
@@ -195,14 +196,14 @@ def knn_classify_pca_faces():
     # 将灰度值缩放到[0,1]之间，而不是[0,255]之间，可以得到更好的数据稳定性
     X_people = X_people / 255.
     from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(X_people, y_people, stratify = y_people, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X_people, y_people, stratify=y_people, random_state=seed)
 
     # 1) 使用KNN训练和测试数据
     # 5655=87*65
     # X_train.shape: (1341, 5655)
     # Test set score of 1-knn: 0.27
     from sklearn.neighbors import KNeighborsClassifier
-    knn = KNeighborsClassifier(n_neighbors = 1)
+    knn = KNeighborsClassifier(n_neighbors=1)
     knn.fit(X_train, y_train)
     print('=' * 20)
     print("-- 使用KNN训练和测试原始数据 --")
@@ -219,13 +220,13 @@ def knn_classify_pca_faces():
     plt.suptitle("图3-8：利用PCA对数据进行白化处理")
 
     from sklearn.decomposition import PCA
-    pca = PCA(n_components = 100, whiten = True, random_state = 0)
+    pca = PCA(n_components=100, whiten=True, random_state=seed)
     pca.fit(X_train)
     X_train_pca = pca.transform(X_train)
     X_test_pca = pca.transform(X_test)
 
     from sklearn.neighbors import KNeighborsClassifier
-    knn = KNeighborsClassifier(n_neighbors = 1)
+    knn = KNeighborsClassifier(n_neighbors=1)
     knn.fit(X_train_pca, y_train)
     print('=' * 20)
     print("-- 使用KNN训练和测试经过PCA白化的数据 --")
@@ -234,9 +235,9 @@ def knn_classify_pca_faces():
     print('PCA白化的数据经过KNN训练后测试集的精度: {:.2f}'.format(knn.score(X_test_pca, y_test)))
 
     image_shape = people.images[0].shape
-    fig, axes = plt.subplots(3, 5, figsize = (20, 10), subplot_kw = {'xticks': (), 'yticks': ()})
+    fig, axes = plt.subplots(3, 5, figsize=(20, 10), subplot_kw={'xticks': (), 'yticks': ()})
     for i, (component, ax) in enumerate(zip(pca.components_, axes.ravel())):
-        ax.imshow(component.reshape(image_shape), cmap = 'viridis')
+        ax.imshow(component.reshape(image_shape), cmap='viridis')
         ax.set_title('{}.component'.format((i + 1)))
         pass
     plt.suptitle("图3-9：人脸数据集的前15个主成分的成分向量")
@@ -262,11 +263,11 @@ def plot_nmf_illustration():
 
 def knn_classify_nmf_faces():
     from sklearn.datasets import fetch_lfw_people
-    people = fetch_lfw_people(min_faces_per_person = 20, resize = .7)
+    people = fetch_lfw_people(min_faces_per_person=20, resize=.7)
     image_shape = people.images[0].shape
 
     # 生成一个全0的mask矩阵
-    mask = np.zeros(people.target.shape, dtype = np.bool)
+    mask = np.zeros(people.target.shape, dtype=np.bool)
     for target in np.unique(people.target):
         # 将每个人的前50条数据设置为1，方便取出
         mask[np.where(people.target == target)[0][:50]] = 1
@@ -276,10 +277,10 @@ def knn_classify_nmf_faces():
     # 将灰度值缩放到[0,1]之间，而不是[0,255]之间，可以得到更好的数据稳定性
     X_people = X_people / 255.
     from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(X_people, y_people, stratify = y_people, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X_people, y_people, stratify=y_people, random_state=seed)
 
     from sklearn.neighbors import KNeighborsClassifier
-    knn = KNeighborsClassifier(n_neighbors = 1)
+    knn = KNeighborsClassifier(n_neighbors=1)
     knn.fit(X_train, y_train)
     print('=' * 20)
     print("-- 使用KNN训练和测试原始数据 --")
@@ -288,13 +289,13 @@ def knn_classify_nmf_faces():
 
     # 分量太少，学习的精确度较差
     from sklearn.decomposition import NMF
-    nmf = NMF(n_components = 100, random_state = 0)
+    nmf = NMF(n_components=100, random_state=seed)
     nmf.fit(X_train)
     X_train_nmf = nmf.transform(X_train)
     X_test_nmf = nmf.transform(X_test)
 
     from sklearn.neighbors import KNeighborsClassifier
-    knn = KNeighborsClassifier(n_neighbors = 1)
+    knn = KNeighborsClassifier(n_neighbors=1)
     knn.fit(X_train_nmf, y_train)
 
     print('=' * 20)
@@ -304,16 +305,16 @@ def knn_classify_nmf_faces():
     print('NMF的数据经过KNN训练后测试集的精度: {:.2f}'.format(knn.score(X_test_nmf, y_test)))
     # ToDo: 经过NMF处理的数据精度没有提高？
 
-    fig, axes = plt.subplots(3, 5, figsize = (20, 10), subplot_kw = {'xticks': (), 'yticks': ()})
+    fig, axes = plt.subplots(3, 5, figsize=(20, 10), subplot_kw={'xticks': (), 'yticks': ()})
     plt.suptitle("图3-15 使用15个分量的NMF在人脸数据集上找到的15个分量")
     for i, (component, ax) in enumerate(zip(nmf.components_, axes.ravel())):
-        ax.imshow(component.reshape(image_shape), cmap = 'viridis')
+        ax.imshow(component.reshape(image_shape), cmap='viridis')
         ax.set_title('{}.component'.format((i + 1)))
         pass
 
     components = 3  # 不同分量的图片有一定的共性
     indexes = np.argsort(X_train_nmf[:, components])[::-1]
-    fig, axes = plt.subplots(2, 5, figsize = (20, 10), subplot_kw = {'xticks': (), 'yticks': ()})
+    fig, axes = plt.subplots(2, 5, figsize=(20, 10), subplot_kw={'xticks': (), 'yticks': ()})
     plt.suptitle("图3-16 第3个分量的系数较大的人脸")
     for i, (index, ax) in enumerate(zip(indexes, axes.ravel())):
         ax.imshow(X_train[index].reshape(image_shape))
@@ -321,7 +322,7 @@ def knn_classify_nmf_faces():
 
     components = 7  # 不同分量的图片有一定的共性
     indexes = np.argsort(X_train_nmf[:, components])[::-1]
-    fig, axes = plt.subplots(2, 5, figsize = (20, 10), subplot_kw = {'xticks': (), 'yticks': ()})
+    fig, axes = plt.subplots(2, 5, figsize=(20, 10), subplot_kw={'xticks': (), 'yticks': ()})
     plt.suptitle("图3-16 第7个分量的系数较大的人脸")
     for i, (index, ax) in enumerate(zip(indexes, axes.ravel())):
         ax.imshow(X_train[index].reshape(image_shape))
@@ -332,11 +333,11 @@ def plot_nmf_faces():
     """利用越来越多的非负分量对三张人脸图像进行重建"""
     # 下面这张图计算时间比较长，需要耐心等等
     from sklearn.datasets import fetch_lfw_people
-    people = fetch_lfw_people(min_faces_per_person = 20, resize = .7)
+    people = fetch_lfw_people(min_faces_per_person=20, resize=.7)
     image_shape = people.images[0].shape
 
     # 生成一个全0的mask矩阵
-    mask = np.zeros(people.target.shape, dtype = np.bool)
+    mask = np.zeros(people.target.shape, dtype=np.bool)
     for target in np.unique(people.target):
         # 将每个人的前50条数据设置为1，方便取出
         mask[np.where(people.target == target)[0][:50]] = 1
@@ -346,9 +347,9 @@ def plot_nmf_faces():
     # 将灰度值缩放到[0,1]之间，而不是[0,255]之间，可以得到更好的数据稳定性
     X_people = X_people / 255.
     from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(X_people, y_people, stratify = y_people, random_state = 0)
+    X_train, X_test, y_train, y_test = train_test_split(X_people, y_people, stratify=y_people, random_state=seed)
 
-    mglearn.plots.plot_nmf_faces(X_train, X_test, image_shape = image_shape)
+    mglearn.plots.plot_nmf_faces(X_train, X_test, image_shape=image_shape)
     plt.suptitle("图3-14 利用越来越多的非负分量对三张人脸图像进行重建")
 
 
@@ -362,30 +363,30 @@ def blind_source_separation():
     from mglearn.datasets import make_signals
     source = mglearn.datasets.make_signals()
     print('原始信号的形状: {}'.format(source.shape))
-    plt.figure(figsize = (12, 4))
+    plt.figure(figsize=(12, 4))
     plt.plot(source, '-')
     plt.xlabel('时间')
     plt.ylabel('信号')
     plt.suptitle("图3-18 原始信号源")
 
     # 混合数据（混合成100维的数据）
-    A = np.random.RandomState(0).uniform(size = (100, 3))
+    A = np.random.RandomState(0).uniform(size=(100, 3))
     X = np.dot(source, A.T)
     print('混合信号的形状: {}'.format(X.shape))
 
     # 解混数据
     from sklearn.decomposition import NMF
-    nmf = NMF(n_components = 3, random_state = 42)
+    nmf = NMF(n_components=3, random_state=seed)
     nmf_signal = nmf.fit_transform(X)
     print('NMF 恢复信号的形状: {}'.format(nmf_signal.shape))
-    plt.figure(figsize = (12, 4))
+    plt.figure(figsize=(12, 4))
     plt.plot(nmf_signal, '-')
     plt.xlabel('时间')
     plt.ylabel('信号')
     plt.suptitle("NMF 变换后的信号源")
 
     print("NMF 成分的形状: {}".format(nmf.components_.shape))
-    plt.figure(figsize = (12, 4))
+    plt.figure(figsize=(12, 4))
     x_scale = [n for n in range(0, 100)]
     plt.plot(x_scale, nmf.components_[0], '-')
     plt.plot(x_scale, nmf.components_[1], '-')
@@ -396,17 +397,17 @@ def blind_source_separation():
 
     # 使用PCA进行对比
     from sklearn.decomposition import PCA
-    pca = PCA(n_components = 3)
+    pca = PCA(n_components=3)
     pca_signal = pca.fit_transform(X)
     print('PCA 恢复信号的形状: {}'.format(pca_signal.shape))
-    plt.figure(figsize = (12, 4))
+    plt.figure(figsize=(12, 4))
     plt.plot(pca_signal, '-')
     plt.xlabel('时间')
     plt.ylabel('信号')
     plt.suptitle("NMF 变换后的信号源")
 
     print("PCA 成分的形状: {}".format(pca.components_.shape))
-    plt.figure(figsize = (12, 4))
+    plt.figure(figsize=(12, 4))
     x_scale = [n for n in range(0, 100)]
     plt.plot(x_scale, pca.components_[0], '-')
     plt.plot(x_scale, pca.components_[1], '-')
@@ -421,8 +422,8 @@ def blind_source_separation():
              '真实的信号（正弦信号、方波信号、锯齿信号）',
              'NMF 恢复的信号',
              'PCA 恢复的信号']
-    fig, axes = plt.subplots(4, figsize = (8, 4), gridspec_kw = {'hspace': .5},
-                             subplot_kw = {'xticks': (), 'yticks': ()})
+    fig, axes = plt.subplots(4, figsize=(8, 4), gridspec_kw={'hspace': .5},
+                             subplot_kw={'xticks': (), 'yticks': ()})
     plt.suptitle("图3-19 利用NMF和PCA还原混合的信号源")
     for model, name, ax in zip(models, names, axes):
         ax.set_title(name)
@@ -443,7 +444,7 @@ def t_SNE():
     print("手写数字数据集的形状= {}".format(digits.data.shape))  # (1797, 64)
     print("手写数字数据集中图片的形状= {}".format(digits.images.shape))  # (1797, 8, 8)
 
-    fig, axes = plt.subplots(4, 5, figsize = (10, 5), subplot_kw = {'xticks': (), 'yticks': ()})
+    fig, axes = plt.subplots(4, 5, figsize=(10, 5), subplot_kw={'xticks': (), 'yticks': ()})
     plt.suptitle("图3-20：digits 数据集的示例图像")
     for ax, img, target in zip(axes.ravel(), digits.images, digits.target):
         ax.imshow(img)
@@ -452,20 +453,20 @@ def t_SNE():
 
     # 构建一个PCA模型
     from sklearn.decomposition import PCA
-    pca = PCA(n_components = 2)
+    pca = PCA(n_components=2)
     pca.fit(digits.data)  # digits.data提供的是buffer object，估计是用于其他函数访问数据
     digits_pca = pca.transform(digits.data)
     colors = ['red', 'green', 'blue', 'purple', 'pink',
               'black', 'orange', 'cyan', 'yellow', 'lightgrey']
 
-    plt.figure(figsize = (10, 10))
+    plt.figure(figsize=(10, 10))
     plt.xlim(digits_pca[:, 0].min(), digits_pca[:, 0].max())
     plt.ylim(digits_pca[:, 1].min(), digits_pca[:, 1].max())
     for i in range(len(digits.data)):
         # 绘制散点图，但是不使用散点表示数据，而用具体的数字表示数据
         plt.text(digits_pca[i, 0], digits_pca[i, 1], str(digits.target[i]),
-                 color = colors[digits.target[i]],
-                 fontdict = {'weight': 'bold', 'size': 9})
+                 color=colors[digits.target[i]],
+                 fontdict={'weight': 'bold', 'size': 9})
     plt.xlabel('第一个主成分')
     plt.ylabel('第二个主成分')
     plt.suptitle("图3-21：利用两个主成分绘制digits数据集的散点图")
@@ -473,22 +474,23 @@ def t_SNE():
     # 构建t-SNE模型（基于流形，使距离近的点更近，距离远的点更远，从而增加可分性）
     # t-SNE并不知道类别标签，只是利用原始空间中数据点之间的靠近程度就可以将类别通过无监督算法进行分隔
     from sklearn.manifold import TSNE
-    tsne = TSNE(random_state = 42)
+    tsne = TSNE(random_state=seed)
     # 使用fit_transform()函数，是因为t-SNE模型没有transform()函数，因为模型只对训练数据集进行计算，不能再对测试数据集进行计算
     digits_tsne = tsne.fit_transform(digits.data)
     print("经过 t-SNE 变换后的数据的状态={}".format(digits_tsne.shape))
 
-    plt.figure(figsize = (10, 10))
+    plt.figure(figsize=(10, 10))
     plt.xlim(digits_tsne[:, 0].min(), digits_tsne[:, 0].max())
     plt.ylim(digits_tsne[:, 1].min(), digits_tsne[:, 1].max())
     for i in range(len(digits.data)):
         # 绘制散点图，但是不使用散点表示数据，而用具体的数字表示数据
         plt.text(digits_tsne[i, 0], digits_tsne[i, 1], str(digits.target[i]),
-                 color = colors[digits.target[i]],
-                 fontdict = {'weight': 'bold', 'size': 9})
+                 color=colors[digits.target[i]],
+                 fontdict={'weight': 'bold', 'size': 9})
     plt.xlabel('t-SNE feature 0')
     plt.ylabel('t-SNE feature 1')
     plt.suptitle("图3-22：利用t-SNE找到的两个分量绘制digits数据集的散点图")
+
 
 if __name__ == "__main__":
     # 图3-3：用PCA做数据变换
@@ -500,7 +502,7 @@ if __name__ == "__main__":
     # pca_cancer_standard_scaler_2d()
 
     # 使用PCA方法取出三个主要特征，显示出线性可分性，也显示出第一个主成分作用最大
-    # pca_cancer_standard_scaler_3d()
+    pca_cancer_standard_scaler_3d()
 
     # 图3-7：来自 Wild 数据集中已经标注的人脸中的一些图像
     # show_original_faces()
@@ -523,12 +525,7 @@ if __name__ == "__main__":
     # 对比 NMF 和 PCA 方法在超定盲信号分离上的效果
     # blind_source_separation()
 
-
     t_SNE()
-    import winsound
 
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    beep_end()
+    show_figures()
