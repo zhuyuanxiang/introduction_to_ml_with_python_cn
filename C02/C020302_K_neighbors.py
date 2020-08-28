@@ -124,7 +124,7 @@ def compare_KNeighborsRegressor():
 
 
 def fit_KNeighborsRegressor():
-    X_test, X_train, y_test, y_train = load_train_test_wave()
+    X_test, X_train, y_test, y_train = load_train_test_wave(100)
     from sklearn.neighbors import KNeighborsRegressor
     for n_neighbors in [1, 3, 5, 7]:
         regress = KNeighborsRegressor(n_neighbors=n_neighbors).fit(X_train, y_train)
@@ -144,7 +144,7 @@ def fit_KNeighborsRegressor():
 
 # 4) 分析 KNeighborsRegressor() 函数
 def analysis_KNeighborsRegressor():
-    X_test, X_train, y_test, y_train = load_train_test_wave()
+    X_test, X_train, y_test, y_train = load_train_test_wave(n_samples=40)
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     line = np.linspace(-3, 3, 1000).reshape(-1, 1)
     print(line.data.shape)
