@@ -13,25 +13,61 @@
 @Reference  :   《Python机器学习基础教程》, Sec020305，P54
 @Desc       :   监督学习算法。决策树。使用CART算法实现。
 """
-
 # Chap2 监督学习
-import config
+
+import graphviz
 import matplotlib.pyplot as plt
 import mglearn
-import sklearn
 import numpy as np
 import pandas as pd
+import sklearn
+from sklearn.model_selection import train_test_split
 
-
+from config import seed
 # 2.3.5. 决策树
+from config import tmp_path
+from tools import show_title
 
-def plot_feature_importance_cancer(model, dataset):
+
+def plot_feature_importance(model, dataset):
     n_features = dataset.data.shape[1]
-    plt.barh(range(n_features), model.feature_importances_, align = 'center')
+    plt.barh(range(n_features), model.feature_importances_, align='center')
     plt.yticks(np.arange(n_features), dataset.feature_names)
-    plt.xlabel('Feature importance')
-    plt.ylabel('Feature')
+    plt.xlabel('特征的重要性')
+    plt.ylabel('特征')
     pass
+
+
+def train_decision_tree(dataset, X_train, X_test, y_train, y_test):
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.tree import export_graphviz
+    for max_depth in [1, 3, 4, 5, 6, 9]:
+        tree = DecisionTreeClassifier(random_state=seed, max_depth=max_depth)
+        tree.fit(X_train, y_train)
+
+        title_str = f" 决策树 max_depth = {max_depth} "
+        show_title(title_str)
+        print('训练集得分: {:.3f}'.format(tree.score(X_train, y_train)))
+        print('测试集得分: {:.3f}'.format(tree.score(X_test, y_test)))
+
+        print('特征重要性:\n{}'.format(tree.feature_importances_))
+        plt.figure()
+        plot_feature_importance(tree, dataset)
+        plt.suptitle(title_str)
+
+        # 输出决策树到文件中，用于后期分析
+        out_file = tmp_path + 'tree_{}.dot'.format(max_depth)
+        export_graphviz(tree, out_file=out_file, impurity=False, filled=True,
+                        feature_names=dataset.feature_names,
+                        class_names=list(dataset.target_names))
+
+        # 打开文件中保存的决策树，并且显示为图形用于分析
+        with open(out_file) as f:
+            dot_graph = f.read()
+        graph = graphviz.Source(dot_graph)
+        graph.render(tmp_path + 'tree_{}'.format(max_depth))
+        graph.view()
+        pass
 
 
 # 分类和回归树(Classification and Regression Tree, CART)是一种通用的树生长算法。
@@ -51,40 +87,12 @@ def draw_decision_tree():
 #       https://stackoverflow.com/questions/43321394/what-is-random-state-parameter-in-scikit-learn-tsne
 #       https://scikit-learn.org/stable/modules/tree.html#tree
 def train_decision_tree_with_iris():
-    import graphviz
-    from sklearn.model_selection import train_test_split
     iris = sklearn.datasets.load_iris()
     X_train, X_test, y_train, y_test = train_test_split(
-            iris.data, iris.target, stratify = iris.target, random_state = config.seed)
-    from sklearn.tree import DecisionTreeClassifier
-    from sklearn.tree import export_graphviz
+            iris.data, iris.target, stratify=iris.target, random_state=seed)
+
     # max_depth=2，4 时，测试集的精度最高，但是max_depth=4时训练集的精度过高（有过拟合的危险），因此建议选择2。
-    for max_depth in [1, 2, 3, 4, 9]:
-        tree = DecisionTreeClassifier(random_state = config.seed, max_depth = max_depth)
-        tree.fit(X_train, y_train)
-
-        print('=' * 20)
-        print("-- Decision Tree max_depth = {} --".format(max_depth))
-        print('Training set score: {:.3f}'.format(tree.score(X_train, y_train)))
-        print('Test set score: {:.3f}'.format(tree.score(X_test, y_test)))
-
-        print('Feature importance:\n{}'.format(tree.feature_importances_))
-        plt.figure()
-        plot_feature_importance_cancer(tree, iris)
-        plt.suptitle("-- Decision Tree max_depth = {} --".format(max_depth))
-
-        # 输出决策树到文件中，用于后期分析
-        out_file = 'tree_{}.dot'.format(max_depth)
-        export_graphviz(tree, out_file = out_file, impurity = False, filled = True,
-                        feature_names = iris.feature_names, class_names = list(iris.target_names))
-
-        # 打开文件中保存的决策树，并且显示为图形用于分析
-        with open(out_file) as f:
-            dot_graph = f.read()
-        graph = graphviz.Source(dot_graph)
-        graph.render('tree_{}'.format(max_depth))
-        graph.view()
-        pass
+    train_decision_tree(iris, X_train, X_test, y_train, y_test)
     pass
 
 
@@ -92,43 +100,14 @@ def train_decision_tree_with_iris():
 # 对树预剪枝，从而控制树的深度，可以防止过拟合，增加测试集的精度
 # Scikit-Learn只实现了“预剪枝”，没有实现“后剪枝”。
 def train_decision_tree_with_cancer():
-    import graphviz
     # 完美地记住训练数据的所有标签，但是测试精度比线性模型要低，说明过拟合了。
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
     X_train, X_test, y_train, y_test = train_test_split(
-            cancer.data, cancer.target, stratify = cancer.target, random_state = config.seed)
+            cancer.data, cancer.target, stratify=cancer.target, random_state=seed)
 
-    from sklearn.tree import DecisionTreeClassifier
-    from sklearn.tree import export_graphviz
     # max_depth=4,5 时，测试集的精度最高，但是max_depth=5时训练集的精度过高（有过拟合的危险），因此建议选择4。
-    for max_depth in [1, 3, 4, 5, 6, 9]:
-        tree = DecisionTreeClassifier(random_state = config.seed, max_depth = max_depth)
-        tree.fit(X_train, y_train)
-
-        print('=' * 20)
-        print("-- Decision Tree max_depth = {} --".format(max_depth))
-        print('Training set score: {:.3f}'.format(tree.score(X_train, y_train)))
-        print('Test set score: {:.3f}'.format(tree.score(X_test, y_test)))
-
-        print('Feature importance:\n{}'.format(tree.feature_importances_))
-        plt.figure()
-        plot_feature_importance_cancer(tree, cancer)
-        plt.suptitle("-- Decision Tree max_depth = {} --".format(max_depth))
-
-        # 输出决策树到文件中，用于后期分析
-        out_file = 'tree_{}.dot'.format(max_depth)
-        export_graphviz(tree, out_file = out_file, impurity = False, filled = True,
-                        feature_names = cancer.feature_names,
-                        class_names = list(cancer.target_names))
-
-        # 打开文件中保存的决策树，并且显示为图形用于分析
-        with open(out_file) as f:
-            dot_graph = f.read()
-        graph = graphviz.Source(dot_graph)
-        graph.render('tree_{}'.format(max_depth))
-        graph.view()
-        pass
+    train_decision_tree(cancer, X_train, X_test, y_train, y_test)
     pass
 
 
@@ -138,13 +117,13 @@ def plot_decision_tree_important_feature():
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
     X_train, X_test, y_train, y_test = train_test_split(
-            cancer.data, cancer.target, stratify = cancer.target, random_state = config.seed)
+            cancer.data, cancer.target, stratify=cancer.target, random_state=seed)
 
     from sklearn.tree import DecisionTreeClassifier
-    tree = DecisionTreeClassifier(max_depth = 4, random_state = config.seed)
+    tree = DecisionTreeClassifier(max_depth=4, random_state=seed)
     tree.fit(X_train, y_train)
-    print('Feature importance:\n{}'.format(tree.feature_importances_))
-    plot_feature_importance_cancer(tree, cancer)
+    print('特征重要性:\n{}'.format(tree.feature_importances_))
+    plot_feature_importance(tree, cancer)
     plt.suptitle("图2-28：在 cancer 数据集上学到的决策树的特征重要性")
 
 
@@ -155,8 +134,6 @@ def plot_tree_not_monotone():
     graph.view()
     plt.suptitle("图2-29：在二维数据集上学到的决策树的决策边界\n"
                  "二维数据集（y轴上的特征与类别标签是非单调的关系）")
-    # from IPython.display import display
-    # display(graph)     # 无法显示出图形，只能输出类的名称
 
 
 def show_ram_prices_log_scale():
@@ -182,13 +159,14 @@ def fit_decision_tree_regression():
     data_test = ram_prices[ram_prices.date >= 2000]
 
     X_train = data_train.date[:, np.newaxis]
-    y_train = np.log(data_train.price)  # 对价格对对数
+    y_train = np.log(data_train.price)  # 对价格取对数
 
     from sklearn.tree import DecisionTreeRegressor
-    from sklearn.linear_model import LinearRegression
     tree_regressor = DecisionTreeRegressor()
     tree_regressor.fit(X_train, y_train)
-    linear_regression = LinearRegression().fit(X_train, y_train)
+    from sklearn.linear_model import LinearRegression
+    linear_regression = LinearRegression()
+    linear_regression.fit(X_train, y_train)
 
     # 为ram_prices.date增加一维数据，即如果是一维的数据，就变成了二维的数据
     X_all = ram_prices.date[:, np.newaxis]
@@ -201,10 +179,10 @@ def fit_decision_tree_regression():
     price_tree_regressor = np.exp(pred_tree_regressor)
     price_linear_regression = np.exp(pred_linear_regression)
 
-    plt.semilogy(data_train.date, data_train.price, label = 'Training data')
-    plt.semilogy(data_test.date, data_test.price, label = 'Test data')
-    plt.semilogy(ram_prices.date, price_tree_regressor, label = 'Tree prediction')
-    plt.semilogy(ram_prices.date, price_linear_regression, label = 'Linear prediction')
+    plt.semilogy(data_train.date, data_train.price, label='训练数据集')
+    plt.semilogy(data_test.date, data_test.price, label='测试数据集')
+    plt.semilogy(ram_prices.date, price_tree_regressor, label='决策树预测')
+    plt.semilogy(ram_prices.date, price_linear_regression, label='线性回归预测')
     plt.legend()
     plt.suptitle("图2-32：线性模型和回归树对RAM价格数据的预测结果对比")
 
@@ -217,7 +195,7 @@ if __name__ == "__main__":
     # train_decision_tree_with_iris()
 
     # 使用决策树算法处理 cancer 数据集
-    # train_decision_tree_with_cancer()
+    train_decision_tree_with_cancer()
 
     # 4) 树的特征重要性
     # 前面已经实现了。这里只显示了 max_depth = 4 的情况，也是最优的特征选择系数。
@@ -232,6 +210,8 @@ if __name__ == "__main__":
     # 图2-32：线性模型和回归树对RAM价格数据的预测结果对比
     # fit_decision_tree_regression()
 
-    import tools
-    tools.beep_end()
-    tools.show_figures()
+    from tools import beep_end
+    from tools import show_figures
+
+    beep_end()
+    show_figures()
