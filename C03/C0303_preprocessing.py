@@ -20,8 +20,6 @@ import numpy as np
 
 # 设置数据显示的精确度为小数点后3位
 from config import seed
-from tools import beep_end
-from tools import show_figures
 
 np.set_printoptions(precision=3, suppress=True, threshold=np.inf)
 
@@ -176,6 +174,9 @@ if __name__ == "__main__":
 
     # SVM对数据缩放比较敏感
     # preprocess_data_svm()
+
+    from tools import beep_end
+    from tools import show_figures
 
     beep_end()
     show_figures()

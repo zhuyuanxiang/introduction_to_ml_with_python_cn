@@ -18,12 +18,11 @@ import mglearn
 import numpy as np
 
 from config import seed
+
+
 # 3.4. 降维、特征提取与流形学习
 # 3.4.1. 主成分分析：旋转数据集的方法，旋转后的特征之间在统计上不相关。
 # 按照方差的大小，顺序选择成分。
-from tools import beep_end
-from tools import show_figures
-
 
 def plot_pca_illustration():
     mglearn.plots.plot_pca_illustration()
@@ -526,6 +525,9 @@ if __name__ == "__main__":
     # blind_source_separation()
 
     t_SNE()
+
+    from tools import beep_end
+    from tools import show_figures
 
     beep_end()
     show_figures()
