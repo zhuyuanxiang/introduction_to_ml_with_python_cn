@@ -13,11 +13,12 @@
 @Reference  :   《Python机器学习基础教程》, Ch0107，P11
 @Desc       :   引言。第一个应用：鸢尾花分类
 """
-import config
 import mglearn
 import numpy as np
 import pandas as pd
 import sklearn
+
+from config import seed
 
 
 # 1.7. 鸢尾花分类
@@ -38,20 +39,20 @@ def train_iris_segment():  # 在PyCharm中使用Alt+Shift+E一条条语句在Pyt
 
     # 1.7.2. 准备数据
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(
-            iris_dataset['data'], iris_dataset['target'], random_state = config.seed)
+            iris_dataset['data'], iris_dataset['target'], random_state=seed)
     print('X_train shape: {}'.format(X_train.shape))
     print('y_train shape: {}'.format(y_train.shape))
     print('X_test shape: {}'.format(X_test.shape))
     print('y_test shape: {}'.format(y_test.shape))
 
     # 1.7.3. 观察数据(ToDo: 对数据散点图的认识还需要加强）
-    iris_dataframe = pd.DataFrame(X_train, columns = iris_dataset.feature_names)
+    iris_dataframe = pd.DataFrame(X_train, columns=iris_dataset.feature_names)
     grr = pd.plotting.scatter_matrix(
-            iris_dataframe, c = y_train, figsize = (15, 15),
-            marker = 'o', hist_kwds = {'bins': 20}, s = 60, alpha = 0.8, cmap = mglearn.cm3)
+            iris_dataframe, c=y_train, figsize=(15, 15),
+            marker='o', hist_kwds={'bins': 20}, s=60, alpha=0.8, cmap=mglearn.cm3)
 
     # 1.7.4. K近邻算法
-    model = sklearn.neighbors.KNeighborsClassifier(n_neighbors = 1)
+    model = sklearn.neighbors.KNeighborsClassifier(n_neighbors=1)
     model.fit(X_train, y_train)  # 模型训练
 
     # 1.7.5. 做出预测
@@ -77,8 +78,8 @@ def train_iris_segment():  # 在PyCharm中使用Alt+Shift+E一条条语句在Pyt
 def train_iris_completion():
     iris_dataset = sklearn.datasets.load_iris()
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(
-            iris_dataset['data'], iris_dataset['target'], random_state = config.seed)
-    model = sklearn.neighbors.KNeighborsClassifier(n_neighbors = 1)
+            iris_dataset['data'], iris_dataset['target'], random_state=seed)
+    model = sklearn.neighbors.KNeighborsClassifier(n_neighbors=1)
     model.fit(X_train, y_train)  # 模型训练
     print('Test set score: {:.2f}'.format(model.score(X_test, y_test)))
     pass
@@ -91,6 +92,8 @@ if __name__ == "__main__":
     # 鸢尾花分类的完整运行
     train_iris_completion()
 
-    import tools
-    tools.beep_end()
-    tools.show_figures()
+    from tools import beep_end
+    from tools import show_figures
+
+    beep_end()
+    show_figures()
