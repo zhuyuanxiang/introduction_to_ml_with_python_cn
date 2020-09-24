@@ -16,9 +16,9 @@
 
 # 2.3. 监督学习算法
 import matplotlib.pyplot as plt
-import mglearn
 import numpy as np
 
+import mglearn
 from config import seed
 from datasets.load_data import load_train_test_breast_cancer
 from datasets.load_data import load_train_test_wave
@@ -30,6 +30,7 @@ from tools import show_title
 # 1) k近邻分类
 def compare_NeighborsNumber():
     # 左上角的数据点和n_neighbors=1时不同
+    # 测试数据点并没有正确的值，是随意确定的几个值，观察它们如何受n_neighbor的影响
     for n_neighbors in [1, 3, 5, 7]:
         plt.figure()
         mglearn.plots.plot_knn_classification(n_neighbors=n_neighbors)
@@ -39,10 +40,12 @@ def compare_NeighborsNumber():
 
 # 训练K近邻分类模型
 def fit_KNeighborsClassifier():
+    from mglearn.plot_helpers import discrete_scatter
     # 准备forge数据集(二分类问题)，数据越多越准确
     # X, y = datasets.make_forge()
-    X, y = make_my_forge()
-    plt.scatter(X[:, 0], X[:, 1], y, cmap=mglearn.cm2, marker='*')
+    X, y = make_my_forge(n_samples=130)
+    # plt.scatter(X[:, 0], X[:, 1], y, cmap=mglearn.cm2, marker='*')
+    discrete_scatter(X[:, 0], X[:, 1], y, markers=['*'])
 
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed)
@@ -54,13 +57,14 @@ def fit_KNeighborsClassifier():
         show_title(f'邻居个数={n_neighbors}')
         print('测试集预测: {}'.format(clf.predict(X_test)))
         print('测试集精度: {:.2f}'.format(clf.score(X_test, y_test)))
+    print("测试集误差：{}".format((clf.predict(X_test) - y_test).sum()))
 
 
 # 2) 分析 KNeighborsClassifier() 函数
 # 不同n_neighbors值的K近邻模型的决策边界
 def analysis_KNeighborsClassifier():
     # 准备forget数据集，数据越多越准确
-    X, y = make_my_forge()
+    X, y = make_my_forge(n_samples=30)
     # 邻居数越少，决策边界越受每一个数据的特性影响；
     # 邻居数越大，决策边界越受所有数据的平均特性影响，即决策边界会越平滑。
     from sklearn.neighbors import KNeighborsClassifier
@@ -93,9 +97,8 @@ def analysis_KNeighborsClassifier():
 # 以n_neighbors为自变量，对比训练集精度和测试集精度
 def analysis_ModelComplexity():
     X_test, X_train, y_test, y_train = load_train_test_breast_cancer()
-    training_accuracy = []
-    test_accuracy = []
-    neighbors_settings = range(1, 11)
+    training_accuracy, test_accuracy = [], []
+    neighbors_settings = range(1, 21)
 
     # 邻居个数过少时，模型欠拟合，测试数据集的精确度较差，模型泛化能力弱；
     # 邻居个数增加时，模型泛化能力增加，测试数据集的精确度也增加，
@@ -126,9 +129,9 @@ def compare_KNeighborsRegressor():
 def fit_KNeighborsRegressor():
     X_test, X_train, y_test, y_train = load_train_test_wave(100)
     from sklearn.neighbors import KNeighborsRegressor
-    for n_neighbors in [1, 3, 5, 7]:
+    for n_neighbors in [1, 3, 5, 7, 9, 11]:
         regress = KNeighborsRegressor(n_neighbors=n_neighbors).fit(X_train, y_train)
-        print(f'邻居个数: {n_neighbors}')
+        show_title(f'邻居个数: {n_neighbors}')
         print(f'测试集的预测结果:\n{regress.predict(X_test)}')
         # R^2分数，叫做决定系数，是回归模型预测的优度度量。
         '''The coefficient R^2 is defined as (1 - u/v), 
@@ -144,7 +147,7 @@ def fit_KNeighborsRegressor():
 
 # 4) 分析 KNeighborsRegressor() 函数
 def analysis_KNeighborsRegressor():
-    X_test, X_train, y_test, y_train = load_train_test_wave(n_samples=40)
+    X_test, X_train, y_test, y_train = load_train_test_wave(n_samples=140)
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     line = np.linspace(-3, 3, 1000).reshape(-1, 1)
     print(line.data.shape)
@@ -153,8 +156,8 @@ def analysis_KNeighborsRegressor():
     for n_neighbors, ax in zip([1, 3, 5, 7, 9, 11], axes.reshape(6)):
         reg = KNeighborsRegressor(n_neighbors=n_neighbors).fit(X_train, y_train)
         ax.plot(line, reg.predict(line))
-        ax.plot(X_train, y_train, '^', c=mglearn.cm2(0), markersize=8)
-        ax.plot(X_test, y_test, 'v', c=mglearn.cm2(1), markersize=8)
+        ax.plot(X_train, y_train, '^', c=mglearn.cm2(0), markersize=4)
+        ax.plot(X_test, y_test, 'v', c=mglearn.cm2(1), markersize=4)
         ax.set_title('{} 个邻居： 训练得分{:.2f} 测试得分{:.2f}'.format(
                 n_neighbors, reg.score(X_train, y_train), reg.score(X_test, y_test)))
         ax.set_xlabel('特征')
@@ -189,8 +192,7 @@ if __name__ == "__main__":
     # 4) 分析 KNeighborsRegressor() 函数
     analysis_KNeighborsRegressor()
 
-    from tools import beep_end
-    from tools import show_figures
+    import tools
 
-    beep_end()
-    show_figures()
+    tools.beep_end()
+    tools.show_figures()
