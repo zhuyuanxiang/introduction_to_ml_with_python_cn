@@ -40,15 +40,18 @@ def compare_NeighborsNumber():
 
 # 训练K近邻分类模型
 def fit_KNeighborsClassifier():
-    from mglearn.plot_helpers import discrete_scatter
     # 准备forge数据集(二分类问题)，数据越多越准确
+    # 会掩蔽 4 条数据
     # X, y = datasets.make_forge()
-    X, y = make_my_forge(n_samples=130)
-    # plt.scatter(X[:, 0], X[:, 1], y, cmap=mglearn.cm2, marker='*')
-    discrete_scatter(X[:, 0], X[:, 1], y, markers=['*'])
+    X, y = make_my_forge(n_samples=30)
 
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed)
+    from mglearn import discrete_scatter
+    discrete_scatter(X_train[:, 0], X_train[:, 1], y_train, markers=['^'])
+    discrete_scatter(X_test[:, 0], X_test[:, 1], y_test, markers=['*'])
+    # plt.scatter(X_train[:, 0], X_train[:, 1], marker='^')
+    # plt.scatter(X_test[:, 0], X_test[:, 1], marker='v')
 
     from sklearn.neighbors import KNeighborsClassifier
     for n_neighbors in [1, 3]:
@@ -128,6 +131,8 @@ def compare_KNeighborsRegressor():
 
 def fit_KNeighborsRegressor():
     X_test, X_train, y_test, y_train = load_train_test_wave(100)
+    plt.scatter(X_train,y_train)
+    plt.scatter(X_test,y_test)
     from sklearn.neighbors import KNeighborsRegressor
     for n_neighbors in [1, 3, 5, 7, 9, 11]:
         regress = KNeighborsRegressor(n_neighbors=n_neighbors).fit(X_train, y_train)
@@ -187,10 +192,10 @@ if __name__ == "__main__":
     # compare_KNeighborsRegressor()
 
     # K近邻回归的训练
-    # fit_KNeighborsRegressor()
+    fit_KNeighborsRegressor()
 
     # 4) 分析 KNeighborsRegressor() 函数
-    analysis_KNeighborsRegressor()
+    # analysis_KNeighborsRegressor()
 
     import tools
 
