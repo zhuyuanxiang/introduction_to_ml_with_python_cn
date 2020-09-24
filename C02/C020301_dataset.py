@@ -19,16 +19,16 @@ import matplotlib.pyplot as plt
 import mglearn
 import numpy as np
 import sklearn
-
 from mglearn import datasets
-
 
 # 2.3.1. 一些样本数据集
 # 生成forge数据集，是一个二分类数据集，有两个特征
+
+
 def create_forge():
     X, y = datasets.make_forge()
     mglearn.discrete_scatter(X[:, 0], X[:, 1], y)
-    plt.legend(['Class 0', 'Class 1'], loc = 4)
+    plt.legend(['Class 0', 'Class 1'], loc=4)
     plt.xlabel('First feature')
     plt.ylabel('Second feature')
     print('X.shape: {}'.format(X.shape))
@@ -44,8 +44,8 @@ def create_wave():
     # plt.figure()
     # plt.plot(X, y, '^')
     plt.ylim(-3, 3)
-    plt.xlabel('Feature')
-    plt.ylabel('Target')
+    plt.xlabel('特征')
+    plt.ylabel('目标')
     plt.suptitle("图2-3：wave数据集的图像，\n"
                  "x轴表示特征，y轴表示回归目标")
     print('X.shape: {}'.format(X.shape))
@@ -98,3 +98,6 @@ if __name__ == "__main__":
     import tools
     tools.beep_end()
     tools.show_figures()
+
+
+
