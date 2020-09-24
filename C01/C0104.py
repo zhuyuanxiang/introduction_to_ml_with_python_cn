@@ -13,7 +13,6 @@
 @Reference  :   《Python机器学习基础教程》, Ch0104，P05
 @Desc       :   引言。必要的库和工具
 """
-import config
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -52,6 +51,8 @@ def scipy_train():
     print('\n--------')
     data = np.ones(4)
     print('NumPy array:\n{}'.format(data))
+
+    # 将之转化为COO格式的稀疏矩阵
     row_indices = np.arange(4)
     col_indices = np.arange(4)
     eye_coo = sparse.coo_matrix((data, (row_indices, col_indices)))
@@ -60,14 +61,18 @@ def scipy_train():
 
 # 1.4.4. matplotlib
 def matplotlib_train():
+    # 生成一个序列，序列范围是-10到10，总共100个数
     x = np.linspace(-10, 10, 100)
+    # 使用 sin 函数 生成第二个序列
     y = np.sin(x)
-    plt.plot(x, y, marker = 'x')
+    plt.plot(x, y, marker='x')
+    # plot 函数生成一个曲线图表
     plt.show()
 
 
 # 1.4.5. pandas
 def pandas_train():
+    # 生成一个简单的人群数据集
     data = {
             'Name': ['John', 'Anna', 'Peter', 'Linda'],
             'Location': ['New York', 'Paris', 'Berlin', 'London'],
@@ -93,6 +98,6 @@ if __name__ == "__main__":
     pandas_train()
 
     import tools
+
     tools.beep_end()
     tools.show_figures()
-
