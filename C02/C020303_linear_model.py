@@ -48,8 +48,9 @@ def linear_model_regression():
 
 # 2）线性回归，又叫最小二乘法（Least Squares Method，LSM），
 # 目的是预测值和真实值之间的差的平方和，即均方误差最小。
-# 线性回归优点：没有参数
-# 线性回归缺点：无法控制模型的复杂度
+# 均方误差(Mean Squared Error，MSE)：预测值与真实值之间的平方和除以样本数。
+# -   优点：线性回归没有需要设置的参数，即模型没有超参数
+# -   缺点：无法控制模型的复杂度
 # “斜率”参数，也叫做权重，或者系数，保存在coef_属性中；
 # “偏移“参数，也叫截距，保存在intercept_属性中。
 # coef_和intercept_结尾处的下划线：表示从训练数据中计算得到的值，用于区分用户设置的参数
@@ -247,7 +248,7 @@ def compare_elastic_high_dimension_coef_():
 # 默认使用 L2 正则化
 # 线性支持向量分类（Linear Support Vector Classification，LSVC）
 def compare_linear_classification_figure():
-    X, y = make_my_forge()
+    X, y = make_my_forge(n_samples=30)
     fig, axes = plt.subplots(1, 2, figsize=(10, 3))
 
     # 两个模型得到了相似的决策边界，
