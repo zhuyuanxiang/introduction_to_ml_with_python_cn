@@ -20,9 +20,9 @@ from math import log2
 from math import sqrt
 
 import matplotlib.pyplot as plt
-import mglearn
 import sklearn
 
+import mglearn
 from config import seed
 from datasets.load_data import load_train_test_moons
 from tools import plot_feature_importance
@@ -69,8 +69,7 @@ def plot_decision_tree_and_forest():
 def random_forest_max_feature_cancer():
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,
-                                                        random_state=seed)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state=seed)
 
     # 训练随机森林
     print('=' * 20)
@@ -158,7 +157,7 @@ def random_forest_cancer_dataset():
 def plot_gbdt():
     from sklearn.model_selection import train_test_split
     cancer = sklearn.datasets.load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,                                                        random_state=seed)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state=seed)
 
     from sklearn.ensemble import GradientBoostingClassifier
     gbdt = GradientBoostingClassifier(random_state=seed)
@@ -187,7 +186,7 @@ def plot_gbdt_preprunning_max_depth():
     gbdt.fit(X_train, y_train)
 
     # 评价「预剪枝梯度提升决策树」
-    show_title("梯度提升决策树")
+    show_title("梯度提升决策树--降低学习深度，加强预剪枝")
     print("max depth = ", max_depth)
     print('训练集精度: {:.2f}'.format(gbdt.score(X_train, y_train)))
     print('测试集精度: {:.2f}'.format(gbdt.score(X_test, y_test)))
@@ -212,7 +211,7 @@ def plot_gbdt_preprunning_learning_rate():
     gbdt.fit(X_train, y_train)
 
     # 评价「预剪枝梯度提升决策树」
-    show_title("梯度提升决策树")
+    show_title("梯度提升决策树--降低学习率，加强预剪枝")
     print("learning rate = ", learning_rate)
     print('训练集精度: {:.2f}'.format(gbdt.score(X_train, y_train)))
     print('测试集精度: {:.2f}'.format(gbdt.score(X_test, y_test)))
@@ -242,7 +241,8 @@ if __name__ == "__main__":
     # 降低学习率，加强预剪枝
     plot_gbdt_preprunning_learning_rate()
 
-    import tools
+    from tools import beep_end
+    from tools import show_figures
 
-    tools.beep_end()
-    tools.show_figures()
+    beep_end()
+    show_figures()
