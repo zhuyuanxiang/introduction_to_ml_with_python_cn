@@ -15,15 +15,9 @@
 """
 
 # 2.3. 监督学习算法
-import matplotlib.pyplot as plt
-import numpy as np
-
-import mglearn
-from config import seed
-from datasets.load_data import load_train_test_breast_cancer
-from datasets.load_data import load_train_test_wave
-from datasets.load_data import make_my_forge
-from tools import show_title
+from config import *
+from datasets.load_data import *
+from tools import *
 
 
 # 2.3.2. k-NN（k近邻）
@@ -131,8 +125,8 @@ def compare_KNeighborsRegressor():
 
 def fit_KNeighborsRegressor():
     X_test, X_train, y_test, y_train = load_train_test_wave(100)
-    plt.scatter(X_train,y_train)
-    plt.scatter(X_test,y_test)
+    plt.scatter(X_train, y_train)
+    plt.scatter(X_test, y_test)
     from sklearn.neighbors import KNeighborsRegressor
     for n_neighbors in [1, 3, 5, 7, 9, 11]:
         regress = KNeighborsRegressor(n_neighbors=n_neighbors).fit(X_train, y_train)
@@ -197,7 +191,5 @@ if __name__ == "__main__":
     # 4) 分析 KNeighborsRegressor() 函数
     # analysis_KNeighborsRegressor()
 
-    import tools
-
-    tools.beep_end()
-    tools.show_figures()
+    beep_end()
+    show_figures()

@@ -13,22 +13,16 @@
 @Reference  :   《Python机器学习基础教程》, Sec020305，P54
 @Desc       :   监督学习算法。决策树。使用CART算法实现。
 """
-# Chap2 监督学习
-# 2.3.5. 决策树
-
 import graphviz
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import sklearn
 from sklearn.model_selection import train_test_split
 
-import mglearn
-from config import seed
-from config import tmp_path
-from tools import show_title
+from config import *
+from tools import *
 
 
+# Chap2 监督学习
+# 2.3.5. 决策树
 def plot_feature_importance(model, dataset):
     n_features = dataset.data.shape[1]
     plt.barh(range(n_features), model.feature_importances_, align='center')

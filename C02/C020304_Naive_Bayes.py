@@ -15,13 +15,10 @@
 """
 
 # Chap2 监督学习
-import numpy as np
-
-# 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision=3, suppress=True, threshold=np.inf)
-
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
+
+from config import *
 
 X, y = load_iris(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)

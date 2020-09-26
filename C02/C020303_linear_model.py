@@ -15,9 +15,6 @@
 """
 
 # 2.3. 监督学习算法
-import matplotlib.pyplot as plt
-import mglearn
-import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.datasets import make_blobs
 from sklearn.linear_model import ElasticNet
@@ -25,14 +22,11 @@ from sklearn.linear_model import Lasso
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import Ridge
-from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
 
-from config import seed
-from datasets.load_data import load_train_test_extended_boston
-from datasets.load_data import load_train_test_wave
-from datasets.load_data import make_my_forge
-from tools import show_title
+from config import *
+from datasets.load_data import *
+from tools import *
 
 
 # 2.3.3. 线性模型
@@ -485,9 +479,6 @@ if __name__ == "__main__":
 
     # “一对其余”分类器学到的二分类决策边界和得到的多分类决策边界
     # linear_model_multi_classification()
-
-    from tools import beep_end
-    from tools import show_figures
 
     beep_end()
     show_figures()

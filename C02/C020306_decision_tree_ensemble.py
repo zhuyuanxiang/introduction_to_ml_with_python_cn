@@ -19,14 +19,11 @@ import random
 from math import log2
 from math import sqrt
 
-import matplotlib.pyplot as plt
 import sklearn
 
-import mglearn
-from config import seed
+from config import *
 from datasets.load_data import load_train_test_moons
-from tools import plot_feature_importance
-from tools import show_title
+from tools import *
 
 
 # 2.3. 监督学习算法

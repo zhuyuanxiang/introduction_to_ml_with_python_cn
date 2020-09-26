@@ -13,14 +13,13 @@
 @Reference  :   《Python机器学习基础教程》, Sec020301，P24
 @Desc       :   监督学习算法。创建样本数据集并展示数据集的效果图
 """
-
-# 2.3. 监督学习算法
-import matplotlib.pyplot as plt
-import mglearn
-import numpy as np
 import sklearn
+
+from config import *
 from mglearn import datasets
 
+
+# 2.3. 监督学习算法
 # 2.3.1. 一些样本数据集
 # 生成forge数据集，是一个二分类数据集，有两个特征
 
@@ -96,8 +95,6 @@ if __name__ == "__main__":
     load_boston()
 
     import tools
+
     tools.beep_end()
     tools.show_figures()
-
-
-
