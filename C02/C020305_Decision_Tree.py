@@ -14,17 +14,17 @@
 @Desc       :   监督学习算法。决策树。使用CART算法实现。
 """
 # Chap2 监督学习
+# 2.3.5. 决策树
 
 import graphviz
 import matplotlib.pyplot as plt
-import mglearn
 import numpy as np
 import pandas as pd
 import sklearn
 from sklearn.model_selection import train_test_split
 
+import mglearn
 from config import seed
-# 2.3.5. 决策树
 from config import tmp_path
 from tools import show_title
 
@@ -41,8 +41,8 @@ def plot_feature_importance(model, dataset):
 def train_decision_tree(dataset, X_train, X_test, y_train, y_test):
     from sklearn.tree import DecisionTreeClassifier
     from sklearn.tree import export_graphviz
-    for max_depth in [1, 3, 4, 5, 6, 9]:
-        tree = DecisionTreeClassifier(random_state=seed, max_depth=max_depth)
+    for max_depth in range(1, 9):
+        tree = DecisionTreeClassifier(max_depth=max_depth, random_state=seed)
         tree.fit(X_train, y_train)
 
         title_str = f" 决策树 max_depth = {max_depth} "
@@ -158,7 +158,8 @@ def fit_decision_tree_regression():
     data_train = ram_prices[ram_prices.date < 2000]
     data_test = ram_prices[ram_prices.date >= 2000]
 
-    X_train = data_train.date[:, np.newaxis]
+    # X_train = data_train.date[:, np.newaxis]
+    X_train = np.expand_dims(data_train.date, 1)
     y_train = np.log(data_train.price)  # 对价格取对数
 
     from sklearn.tree import DecisionTreeRegressor
@@ -169,7 +170,8 @@ def fit_decision_tree_regression():
     linear_regression.fit(X_train, y_train)
 
     # 为ram_prices.date增加一维数据，即如果是一维的数据，就变成了二维的数据
-    X_all = ram_prices.date[:, np.newaxis]
+    # X_all = ram_prices.date[:, np.newaxis]
+    X_all = np.expand_dims(ram_prices.date, 1)
 
     # 预测数据
     pred_tree_regressor = tree_regressor.predict(X_all)
@@ -195,7 +197,7 @@ if __name__ == "__main__":
     # train_decision_tree_with_iris()
 
     # 使用决策树算法处理 cancer 数据集
-    train_decision_tree_with_cancer()
+    # train_decision_tree_with_cancer()
 
     # 4) 树的特征重要性
     # 前面已经实现了。这里只显示了 max_depth = 4 的情况，也是最优的特征选择系数。
