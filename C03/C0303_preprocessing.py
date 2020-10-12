@@ -14,14 +14,7 @@
 @Desc       :   无监督学习算法。数据预处理和缩放。
 """
 
-import matplotlib.pyplot as plt
-import mglearn
-import numpy as np
-
-# 设置数据显示的精确度为小数点后3位
-from config import seed
-
-np.set_printoptions(precision=3, suppress=True, threshold=np.inf)
+from tools import *
 
 
 # 3.3. 预处理和缩放
@@ -45,7 +38,7 @@ def min_max_scaler():
     from sklearn.datasets import load_breast_cancer
     from sklearn.model_selection import train_test_split
     cancer = load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state=1)
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state=seed)
 
     # 导入预处理器
     from sklearn.preprocessing import MinMaxScaler
@@ -87,17 +80,17 @@ def min_max_scaler():
 def min_max_blob_data():
     from sklearn.datasets import make_blobs
     from sklearn.model_selection import train_test_split
-    X, _ = make_blobs(n_samples=50, centers=5, random_state=4, cluster_std=2)
+    X, _ = make_blobs(n_samples=50, centers=5, random_state=seed, cluster_std=2)
     X_train, X_test = train_test_split(X, random_state=5, test_size=.1)
 
     fig, axes = plt.subplots(1, 3, figsize=(13, 4))
     # 绘制原始的训练集和测试集
-    axes[0].scatter(X_train[:, 0], X_train[:, 1], c='blue', s=60, label='训练数据集')
-    axes[0].scatter(X_test[:, 0], X_test[:, 1], c='red', s=60, label='测试数据集', marker='^')
+    axes[0].scatter(X_train[:, 0], X_train[:, 1], c='blue', s=60, label="训练数据集")
+    axes[0].scatter(X_test[:, 0], X_test[:, 1], c='red', s=60, label="测试数据集", marker='^')
     axes[0].set_title('原始数据')
     axes[0].legend(loc='upper left')
 
-    # 绘制MinMaxSccaler()缩放的训练集和测试集
+    # 绘制MinMaxScaler()缩放的训练集和测试集
     # 导入预处理器
     from sklearn.preprocessing import MinMaxScaler
     scaler = MinMaxScaler()
@@ -162,21 +155,18 @@ def preprocess_data_svm():
     print('缩放后测试集的精确度 {:.2f}'.format(svm.score(X_test_scaled, y_test)))
 
 
-if __name__ == "__main__":
+def main():
     # 图3-1 对数据集缩放和预处理的各种方法
-    data_scale()
-
+    # data_scale()
     # 使用0-1缩放进行预处理的数据
     # min_max_scaler()
-
     # 图3-2：原始数据（左），同时缩放的数据（中），分别缩放的数据（右）
     # min_max_blob_data()
-
     # SVM对数据缩放比较敏感
     # preprocess_data_svm()
+    pass
 
-    from tools import beep_end
-    from tools import show_figures
-
+if __name__ == "__main__":
+    main()
     beep_end()
     show_figures()
