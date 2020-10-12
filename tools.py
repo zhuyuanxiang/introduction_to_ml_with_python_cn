@@ -14,8 +14,7 @@
 @Desc       :   常用的工具函数
 @理解：
 """
-import config
-import matplotlib.pyplot as plt
+from config import *
 
 
 def beep_end():
@@ -35,4 +34,13 @@ def show_figures():
 def show_title(message):
     # 输出运行模块的标题
     print('-' * 5, '>' + message + '<', '-' * 5)
+    pass
+
+
+def plot_feature_importance(model, dataset):
+    n_features = dataset.data.shape[1]
+    plt.barh(range(n_features), model.feature_importances_, align='center')
+    plt.yticks(np.arange(n_features), dataset.feature_names)
+    plt.xlabel('特征重要性')
+    plt.ylabel('特征名称')
     pass

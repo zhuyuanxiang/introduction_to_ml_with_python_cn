@@ -14,19 +14,12 @@
 @Desc       :   配置文件
 @理解：
 """
-import os
-import matplotlib.pyplot as plt
-import numpy as np
+from preamble import *
 
-
-# ----------------------------------------------------------------------
-plt.rcParams['font.sans-serif'] = ['YaHei Consolas Hybrid']  # 用来正常显示中文标签
-plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
-
-# 屏蔽警告：Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-# 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf, linewidth = 200)
 # to make this notebook's output stable across runs
 seed = 42
 np.random.seed(seed)
+
+tmp_path = '../temp/'
+
+__all__ = ['np', 'mglearn', 'plt', 'pd', 'seed', 'tmp_path']
