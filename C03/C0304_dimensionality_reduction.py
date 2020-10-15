@@ -151,9 +151,7 @@ def pca_cancer_standard_scaler_3d():
 # 例如：提取的特征脸是脸部照片中变化最大的地方，即人脸的细节，那些细节代表着光影变化较大的地方，比如：轮廓、皱纹等等
 # 某些类别的数据过多，会导致数据偏斜，可以通过限制每个类别的数据量来解决
 def show_original_faces():
-    # 将文件 `lfw_home.zip` 解压到 `~/scikit-learn_data` 目录下
-    from sklearn.datasets import fetch_lfw_people
-    people = fetch_lfw_people(min_faces_per_person=20, resize=.7)
+    people = load_people()
 
     print('=' * 20)
     print('人脸数据集中数据形状: {}'.format(people.images.shape))
@@ -176,7 +174,7 @@ def show_original_faces():
 
 
 def knn_classify_original_faces():
-    X_test, X_train, y_test, y_train = load_train_test_faces()
+    X_train, X_test, y_train, y_test= load_train_test_faces()
 
     # 1) 使用KNN训练和测试数据
     # 5655=87*65

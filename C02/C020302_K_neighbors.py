@@ -93,7 +93,7 @@ def analysis_KNeighborsClassifier():
 
 # 以n_neighbors为自变量，对比训练集精度和测试集精度
 def analysis_ModelComplexity():
-    X_test, X_train, y_test, y_train = load_train_test_breast_cancer()
+    X_train, X_test, y_train, y_test = load_train_test_breast_cancer()
     training_accuracy, test_accuracy = [], []
     neighbors_settings = range(1, 21)
 
@@ -124,7 +124,7 @@ def compare_KNeighborsRegressor():
 
 
 def fit_KNeighborsRegressor():
-    X_test, X_train, y_test, y_train = load_train_test_wave(100)
+    X_train, X_test, y_train, y_test = load_train_test_wave(100)
     plt.scatter(X_train, y_train)
     plt.scatter(X_test, y_test)
     from sklearn.neighbors import KNeighborsRegressor
@@ -146,7 +146,7 @@ def fit_KNeighborsRegressor():
 
 # 4) 分析 KNeighborsRegressor() 函数
 def analysis_KNeighborsRegressor():
-    X_test, X_train, y_test, y_train = load_train_test_wave(n_samples=140)
+    X_train, X_test, y_train, y_test = load_train_test_wave(n_samples=140)
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     line = np.linspace(-3, 3, 1000).reshape(-1, 1)
     print(line.data.shape)
