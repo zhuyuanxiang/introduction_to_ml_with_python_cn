@@ -76,6 +76,54 @@ def min_max_scaler():
     print('测试数据集变换后每一个特征的最大值:\n{}'.format(X_test_scaled.max(axis=0)))
 
 
+def stand_scaler():
+    # 导入数据
+    from sklearn.datasets import load_breast_cancer
+    from sklearn.model_selection import train_test_split
+    cancer = load_breast_cancer()
+    X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target, random_state=seed)
+
+    # 导入预处理器
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+
+    # 训练预处理器
+    scaler.fit(X_train)
+
+    # 变换数据
+    X_train_scaled = scaler.transform(X_train)
+
+    print('=' * 20)
+    print("训练数据集变换前的形状：", X_train.shape)
+    print("训练数据集变换后的形状：", X_train_scaled.shape)
+    print('-' * 20)
+    print('训练数据集变换前每一个特征的最小值:\n{}'.format(X_train.min(axis=0)))
+    print('训练数据集变换后每一个特征的最小值:\n{}'.format(X_train_scaled.min(axis=0)))
+    print('-' * 20)
+    print('训练数据集变换前每一个特征的最大值:\n{}'.format(X_train.max(axis=0)))
+    print('训练数据集变换后每一个特征的最大值:\n{}'.format(X_train_scaled.max(axis=0)))
+    print('-' * 20)
+    print('-' * 20)
+    print(f"训练数据集变换前的均值：\n{X_train.mean()}")
+    print(f"训练数据集变换后的均值：\n{X_train_scaled.mean()}")
+    print('-' * 20)
+    print(f"训练数据集变换前的标准差：\n{X_train.std()}")
+    print(f"训练数据集变换后的标准差：\n{X_train_scaled.std()}")
+
+    X_test_scaled = scaler.transform(X_test)
+    print('=' * 20)
+    print("测试数据集变换前的形状：", X_test.shape)
+    print("测试数据集变换后的形状：", X_test_scaled.shape)
+    print('-' * 20)
+    print('测试数据集变换前每一个特征的最小值:\n{}'.format(X_test.min(axis=0)))
+    print('-' * 20)
+    print('测试数据集变换前每一个特征的最大值:\n{}'.format(X_test.max(axis=0)))
+    print('-' * 20)
+    print('测试数据集变换后每一个特征的最小值:\n{}'.format(X_test_scaled.min(axis=0)))
+    print('-' * 20)
+    print('测试数据集变换后每一个特征的最大值:\n{}'.format(X_test_scaled.max(axis=0)))
+
+
 # 3.3.3. 对训练数据和测试数据进行相同的缩放
 def min_max_blob_data():
     from sklearn.datasets import make_blobs
@@ -160,11 +208,13 @@ def main():
     # data_scale()
     # 使用0-1缩放进行预处理的数据
     # min_max_scaler()
+    stand_scaler()
     # 图3-2：原始数据（左），同时缩放的数据（中），分别缩放的数据（右）
     # min_max_blob_data()
     # SVM对数据缩放比较敏感
     # preprocess_data_svm()
     pass
+
 
 if __name__ == "__main__":
     main()
