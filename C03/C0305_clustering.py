@@ -13,11 +13,8 @@
 @Reference  :   《Python机器学习基础教程》, Sec02?
 @Desc       :   监督学习算法。
 """
-import matplotlib.pyplot as plt
-import mglearn
-import numpy as np
-
-from config import seed
+from datasets.load_data import load_people, load_train_test_faces
+from tools import *
 
 
 # 3.5. 聚类（clustering）
@@ -34,7 +31,7 @@ def plot_kmeans_algorithm():
     plt.suptitle("图3-23：输入数据与K均值算法的三个步骤")
 
 
-def plot_kmeans_boudaries():
+def plot_kmeans_boundaries():
     mglearn.plots.plot_kmeans_boundaries()
     plt.suptitle("图3-24：K均值算法找到的簇中心和簇边界")
 
@@ -55,14 +52,14 @@ def knn_cluster():
     print("原始训练数据集的类别标签：\n", y_train)
     print("原始训练数据集的类别标签统计结果：", np.bincount(y_train))
     print('-' * 20)
-    print("K均值算法无监督聚类训练数据集的输出:\n", kmeans.labels_)
-    print("K均值算法无监督聚类训练数据集的输出的统计结果", np.bincount(kmeans.labels_))
+    print("K均值算法「无监督聚类」训练数据集的输出:\n", kmeans.labels_)
+    print("K均值算法「无监督聚类」训练数据集的输出的统计结果", np.bincount(kmeans.labels_))
     print('-' * 20)
     print("原始测试数据集的类别标签：", y_test)
     print("原始测试数据集的类别标签统计结果：", np.bincount(y_test))
     print('-' * 20)
-    print("K均值算法无监督聚类测试数据集的输出:\n", kmeans.predict(X_test))  # 预测数据
-    print("K均值算法无监督聚类测试数据集的输出的统计结果", np.bincount(kmeans.predict(X_test)))
+    print("K均值算法「无监督聚类」测试数据集的输出:\n", kmeans.predict(X_test))  # 预测数据
+    print("K均值算法「无监督聚类」测试数据集的输出的统计结果", np.bincount(kmeans.predict(X_test)))
 
     fig, axes = plt.subplots(1, 2, figsize=(15, 8))
     # 绘制原始数据点的散点图
@@ -89,22 +86,6 @@ def knn_cluster():
         ax = axes[cluster // 2 - 1][cluster % 2]
         ax.set_title("{}个簇".format(cluster))
         mglearn.discrete_scatter(x1=X_train[:, 0], x2=X_train[:, 1], y=kmeans.labels_, ax=ax)
-
-    # fig, axes = plt.subplots(1, 2, figsize = (15, 8))
-    # plt.suptitle("图3-26：使用2个簇（左）和5个簇（右）的K均值算法找到的簇分配")
-
-    # 更少的簇中心：2个簇中心
-
-    # kmeans = KMeans(n_clusters = 2)
-    # kmeans.fit(X_train)
-    #
-    # mglearn.discrete_scatter(x1 = X_train[:, 0], x2 = X_train[:, 1], y = kmeans.labels_, ax = axes[0])
-
-    # 更多的簇中心：5个簇中心
-    # kmeans = KMeans(n_clusters = 5)
-    # kmeans.fit(X_train)
-    #
-    # mglearn.discrete_scatter(x1 = X_train[:, 0], x2 = X_train[:, 1], y = kmeans.labels_, ax = axes[1])
 
 
 # 1. K 均值的失败案例
@@ -201,23 +182,9 @@ def knn_failed():
 # 2. 失量量化，也是 K 均值分解
 # K均值利用簇中心来表示每个数据点，即用一个分量来表示每个数据点，这个分量由簇中心给出，被称为失量量化（Vector Quantization）
 def kmeans_vector_quantization():
-    from sklearn.datasets import fetch_lfw_people
-    people = fetch_lfw_people(min_faces_per_person=20, resize=.7)
+    people = load_people()
     image_shape = people.images[0].shape
-
-    # 生成一个全0的mask矩阵
-    mask = np.zeros(people.target.shape, dtype=np.bool)
-    for target in np.unique(people.target):
-        # 将每个人的前50条数据设置为1，方便取出
-        mask[np.where(people.target == target)[0][:50]] = 1
-
-    X_people = people.data[mask]
-    y_people = people.target[mask]
-    # 将灰度值缩放到[0,1]之间，而不是[0,255]之间，可以得到更好的数据稳定性
-    X_people = X_people / 255.
-
-    from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(X_people, y_people, stratify=y_people, random_state=seed)
+    X_train, X_test, y_train, y_test = load_train_test_faces()
 
     from sklearn.cluster import KMeans
     kmeans = KMeans(n_clusters=100, random_state=seed)
@@ -268,8 +235,7 @@ def kmeans_two_moons():
     X_moons, y_moons = make_moons(n_samples=200, noise=0.05, random_state=seed)
     plt.figure()
     plt.suptitle("原始数据")
-    plt.scatter(X_moons[:, 0], X_moons[:, 1], c=y_moons,
-                s=60, cmap='Paired')
+    plt.scatter(X_moons[:, 0], X_moons[:, 1], c=y_moons, s=60, cmap='Paired')
     from sklearn.cluster import KMeans
     # for cluster_number in [10]:
     for cluster_number in range(2, 12, 3):
@@ -287,8 +253,7 @@ def kmeans_two_moons():
 
         plt.figure()
         plt.suptitle("图3-32：利用K均值的{}个簇来表示复杂数据集中的变化".format(cluster_number))
-        plt.scatter(X_moons[:, 0], X_moons[:, 1], c=y_predict,
-                    s=60, cmap='Paired')
+        plt.scatter(X_moons[:, 0], X_moons[:, 1], c=y_predict, s=60, cmap='Paired')
         plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], c=range(kmeans.n_clusters),
                     s=60, cmap='Paired', marker='^', linewidths=2)
         plt.xlabel('Feature 0')
@@ -296,12 +261,10 @@ def kmeans_two_moons():
 
         plt.figure()
         plt.suptitle("图3-32：利用K均值的{}个簇来恢复复杂数据集中的变化".format(cluster_number))
-        plt.scatter(distance_features[:, 0], distance_features[:, 1], c=y_predict,
-                    s=60, cmap='Paired')
+        plt.scatter(distance_features[:, 0], distance_features[:, 1], c=y_predict, s=60, cmap='Paired')
         plt.xlabel('Feature 0')
         plt.ylabel('Feature 1')
         pass
-    plt.show()
 
 
 # 3.5.2. 凝聚聚类：基于相同原则构建的聚类算法。
@@ -364,7 +327,7 @@ def plot_agglomerative_hierarchical_clustering():
     # 层次聚类无法展现超过二维的数据，而树状图可以
     # 树状图可以使用SciPy提供的函数来生成，函数接受数据数组，再计算出链接数组
     from sklearn.datasets import make_blobs
-    X_blobs, y_blobs = make_blobs(random_state=seed, n_samples=12)
+    X_blobs, y_blobs = make_blobs(random_state=0, n_samples=12)
     plt.figure()
     # ward()实现聚类
     from scipy.cluster.hierarchy import dendrogram, ward
@@ -389,9 +352,9 @@ def plot_agglomerative_hierarchical_clustering():
 # 缺点：比凝聚聚类和K均值的速度慢
 # 原理：识别特征空间的“拥挤”区域中的点，这些数据点靠在一起的区域称为密集区域。
 # 思想：簇由数据的密集区域确定，并由相对较空的区域隔开。
-# 在密集区域内的点被称为核心样本（Core Sample），也叫核心点。
-# 与核心点的距离在eps之内的点称为边界点。
-# 距离起始点的距离在eps范围内的数据点个数小于min_samples时，这个起始点被称为噪声点。
+# 在密集区域内的点被称为核心样本（Core Sample），也叫「核心点」。
+# 与核心点的距离在eps之内的点称为「边界点」。
+# 距离起始点的距离在eps范围内的数据点个数小于min_samples时，这个起始点被称为「噪声点」。
 # DBSCAN使用两个参数：min_samples和eps定义。
 # 如果在距一个给定数据eps的距离内至少有min_samples个数据点，那么这个数据点就是核心样本，这些核心样本放在一个簇内。
 # DBSCAN对访问顺序会有轻度依赖。
@@ -404,11 +367,12 @@ def dbscan_blobs():
     plt.scatter(X_blobs[:, 0], X_blobs[:, 1], c=y_blobs, cmap=mglearn.cm3)
     plt.suptitle("原始数据有12个数据点")
 
-    # 默认：eps=0.5, min_samples=5
+    show_title("默认：eps=0.5, min_samples=5")
     from sklearn.cluster import DBSCAN
-    dbscan = DBSCAN()
+    dbscan = DBSCAN(n_jobs=7)
     clusters = dbscan.fit_predict(X_blobs)
     print('Cluster memberships:\n{}'.format(clusters))
+    print("Cluster class number:\n{}".format(np.unique(clusters).size))
 
     mglearn.plots.plot_dbscan()
     plt.subplots_adjust(top=0.9)
@@ -431,14 +395,16 @@ def dbscan_blobs():
     plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=y_blobs, cmap=mglearn.cm3)
     plt.suptitle("原始数据有120个数据点")
 
-    fig, axes = plt.subplots(3, 4, figsize=(20, 10), subplot_kw={'xticks': (), 'yticks': ()})
+    fig, axes = plt.subplots(3, 5, figsize=(20, 10), subplot_kw={'xticks': (), 'yticks': ()})
     from sklearn.cluster import DBSCAN
 
     for ax, (min_sample, eps) in zip(axes.ravel(),
-                                     [(2, 0.1), (2, 0.3), (2, 0.5), (2, 0.7),
-                                      (3, 0.1), (3, 0.3), (3, 0.5), (3, 0.7),
-                                      (5, 0.1), (5, 0.3), (5, 0.5), (5, 0.7), ]):
+                                     [(2, 0.1), (2, 0.3), (2, 0.5), (2, 1.0), (2, 2.0),
+                                      (3, 0.1), (3, 0.3), (3, 0.5), (3, 1.0), (3, 2.0),
+                                      (5, 0.1), (5, 0.3), (5, 0.5), (5, 1.0), (5, 2.0), ]):
         clusters = DBSCAN(eps=eps, min_samples=min_sample).fit_predict(X_scaled)
+        show_title(f"min_sample={min_sample},eps={eps}")
+        print("Cluster class number:\n{}".format(np.unique(clusters).size))
 
         ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c=clusters, cmap=cm_cycle, s=60)
         ax.set_xlabel('Feature 0')
@@ -457,7 +423,7 @@ def dbscan_two_moons():
     scaler.fit(X_moons)
     X_scaled = scaler.transform(X_moons)
 
-    # red,blue,gree,black,pink,
+    # red,blue,green,black,pink,
     from matplotlib.colors import ListedColormap
     cm_cycle = ListedColormap(['#0000FF', '#FF0000', '#008000', '#000000', '#FFB6C1',
                                '#0000aa', '#ff5050', '#50ff50', '#9040a0', '#fff000'])
@@ -512,12 +478,12 @@ def evaluate_algorithm_with_ari():
     axes[0, 0].scatter(X_scaled[:, 0], X_scaled[:, 1], c=random_clusters, cmap=mglearn.cm3, s=60)
     from sklearn.metrics.cluster import adjusted_rand_score
     axes[0, 0].set_title("随机分配\n ARI: {:.2f}".format(
-            adjusted_rand_score(y_moons, random_clusters)))
+        adjusted_rand_score(y_moons, random_clusters)))
 
     axes[1, 0].scatter(X_scaled[:, 0], X_scaled[:, 1], c=random_clusters, cmap=mglearn.cm3, s=60)
     from sklearn.metrics.cluster import normalized_mutual_info_score
     axes[1, 0].set_title('随机分配\n NMI: {:.2f}'.format(
-            normalized_mutual_info_score(y_moons, random_clusters, average_method='arithmetic')))
+        normalized_mutual_info_score(y_moons, random_clusters, average_method='arithmetic')))
 
     # 默认：eps=0.5, min_samples=5
     from sklearn.cluster import KMeans
@@ -528,13 +494,13 @@ def evaluate_algorithm_with_ari():
         clusters = algorithm.fit_predict(X_scaled)
         axes[0, ax_index].scatter(X_scaled[:, 0], X_scaled[:, 1], c=clusters, cmap=mglearn.cm3, s=60)
         axes[0, ax_index].set_title('{}\n ARI: {:.2f}'.format(
-                algorithm.__class__.__name__,
-                adjusted_rand_score(y_moons, clusters)))
+            algorithm.__class__.__name__,
+            adjusted_rand_score(y_moons, clusters)))
 
         axes[1, ax_index].scatter(X_scaled[:, 0], X_scaled[:, 1], c=clusters, cmap=mglearn.cm3, s=60)
         axes[1, ax_index].set_title('{}\n NMI: {:.2f}'.format(
-                algorithm.__class__.__name__,
-                normalized_mutual_info_score(y_moons, clusters, average_method='arithmetic')))
+            algorithm.__class__.__name__,
+            normalized_mutual_info_score(y_moons, clusters, average_method='arithmetic')))
         pass
     plt.suptitle("图3-39：基于AR对two_moons数据集上算法进行评价")
     # plt.suptitle("图3-39：利用监督ARI分数在two_moons数据集上比较随机分配、K均值、凝聚聚类和DBSCAN")
@@ -543,15 +509,16 @@ def evaluate_algorithm_with_ari():
 def compare_ari_nmi():
     # accuracy_score() 是用于精确匹配，而聚类关注的是数据是否在相同的簇
     clusters = [
-            [0, 1, 0, 1, 1, 0, 1, 1, 1, 0],
-            [1, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 0, 1, 1, 0, 1, 1, 1, 0],
+        [1, 0, 1, 0, 0, 1, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ]
     from sklearn.metrics import accuracy_score
     from sklearn.metrics.cluster import adjusted_rand_score
     from sklearn.metrics.cluster import normalized_mutual_info_score
 
+    # 类别标签不匹配，但是分类正确时，度量结果也是最佳分类值
     for i in range(0, 4):
         clusters1 = clusters[i]
         for j in range(i + 1, 4):
@@ -560,21 +527,20 @@ def compare_ari_nmi():
             print('clusters1=', clusters1)
             print('clusters2=', clusters2)
             print('Accuracy: {:.2f}'.format(accuracy_score(clusters1, clusters2)))
-            print('ARI: {:.2f}'.format(
-                    adjusted_rand_score(clusters1, clusters2)))
-            print('NMI: {:.2f}'.format(
-                    normalized_mutual_info_score(clusters1, clusters2, average_method='geometric')))
+            print('ARI: {:.2f}'.format(adjusted_rand_score(clusters1, clusters2)))
+            print('NMI: {:.2f}'.format(normalized_mutual_info_score(clusters1, clusters2, average_method='geometric')))
 
 
 # 2）在没有真实值的情况下评估聚类
 # （轮廓系数：计算簇的紧致度，越大越好，满分为1，要求簇的形状不能过于复杂）
 # 实际效果不好，例如：DBSCAN的分类得分却低于KMeans。
 # 基于鲁棒性的聚类指标：先向数据中添加一些噪声，或者使用不同的参数设定，然后运行算法，并对结果进行比较。
-# 基于鲁棒性的聚类指标的思想：如果许多算法参数和许多数据振动返回相同的结果，那么这个指标可能是可信的。Scikit-Learn还未实现。
+# 基于鲁棒性的聚类指标的思想：如果许多算法参数和许多数据扰动返回相同的结果，那么这个指标可能是可信的。Scikit-Learn还未实现。
 def evaluate_algorithms_with_silhouette_coefficient():
     # 将数据缩放成均值为0，方差为1
     from sklearn.datasets import make_moons
     X_moons, y_moons = make_moons(n_samples=200, noise=0.05, random_state=seed)
+
     from sklearn.preprocessing import StandardScaler
     scaler = StandardScaler()
     scaler.fit(X_moons)
@@ -842,76 +808,56 @@ def evaluate_agglomerative_in_faces():
         pass
 
 
-if __name__ == "__main__":
+def main():
     # 图3-23：输入数据与K均值算法的三个步骤
     # plot_kmeans_algorithm()
-
     # 图3-24：K均值算法找到的簇中心和簇边界
-    # plot_kmeans_boudaries()
-
+    # plot_kmeans_boundaries()
     # KNN聚类的效果
     # 图3-25：3个簇的K均值算法找到的簇分配和簇中心
     # 图3-26：K均值算法找到的簇分配
     # knn_cluster()
-
     # K均值算法要求每个簇都是凸形（convex）的，否则聚类会失败
     # knn_failed()
-
     # 对比K均值、PCA 和 NMF 处理失量数据（图片）的效果，K均值的效果不好。
     # kmeans_vector_quantization()
-
     # 双月数据集使用K均值进行聚类，无法正确处理。
     # kmeans_two_moons()
-
     # 图3-33：凝聚聚类用迭代的方式合并两个最近的簇
     # plot_agglomerative_algorithm()
-
     # 三个数据中心的数据集的凝聚聚类
     # three_centers_agglomerative()
-
     # 双月数据集的凝聚聚类
     # two_moons_agglomerative()
-
     # 图3-36：图3-35中聚类的树状图（用线表示划分成两个簇和三个簇）
     # plot_agglomerative_hierarchical_clustering()
-
     # 3.5.3. DBSCAN
     # DBSCAN 不能解决高斯抽样的数据集，因为随机性太强，凝聚性不足
     # dbscan_blobs()
-
     # DBSCAN 解决 two_moons 数据分类问题，而凝聚聚类不行。
     # dbscan_two_moons()
-
     # 3.5.4. 聚类算法的对比和评估
     # 专门用于无监督学习中比较类别，不要求精确匹配
     # evaluate_algorithm_with_ari()
-
     # ARI(adjusted rand index)-调整rand指数
     # NMI（normalized mutual information）-归一化互信息
     # 直观地理解ARI与NMI在相同数据集上的评估结果
     # compare_ari_nmi()
-
     # 2）在没有真实值的情况下评估聚类
     # （轮廓系数：计算簇的紧致度，越大越好，满分为1，要求簇的形状不能过于复杂）
     # evaluate_algorithms_with_silhouette_coefficient()
-
     # 基于人脸数据集，DBSCAN 设置不同参数，得到不同结果的对比
     # show_dbscan_noise_faces()
-
-    # 基于人脸数据集，DBSCAN 设置不同的eps的效果对比。
-    # 效果不好，分析原因可能是没有提供合适的特征，只使用了图片的原始特征。
+    # 使用 DBSCAN 分析人脸数据集，DBSCAN 设置不同的eps的效果对比。效果不好，分析原因可能是没有提供合适的特征，只使用了图片的原始特征。
     # evaluate_dbscan_in_faces()
-
-    # 用K 均值分析人脸数据集
-    # K均值可以创建更加均匀大小的簇。
+    # 用K 均值分析人脸数据集：K均值可以创建更加均匀大小的簇。
     # evaluate_kmeans_in_faces()
+    # 用凝聚聚类分析人脸数据集：凝聚聚类生成的也是大小相近的簇，比DBSCAN更加均匀，没有K均值均匀。
+    # evaluate_agglomerative_in_faces()
+    pass
 
-    # 用凝聚聚类分析人脸数据集
-    # 凝聚聚类生成的也是大小相近的簇，比DBSCAN更加均匀，没有K均值均匀。
-    evaluate_agglomerative_in_faces()
 
-    from tools import beep_end
-    from tools import show_figures
-
+if __name__ == "__main__":
+    main()
     beep_end()
     show_figures()
