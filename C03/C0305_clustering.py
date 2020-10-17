@@ -583,7 +583,6 @@ def show_dbscan_noise_faces():
     for target in np.unique(people.target):
         mask[np.where(people.target == target)[0][:50]] = 1
     X_people = people.data[mask]
-    y_people = people.target[mask]
     X_people = X_people / 255.
 
     from sklearn.decomposition import PCA
@@ -636,12 +635,10 @@ def show_dbscan_noise_faces():
 def evaluate_dbscan_in_faces():
     from sklearn.datasets import fetch_lfw_people
     people = fetch_lfw_people(min_faces_per_person=20, resize=.7)
-    image_shape = people.images[0].shape
     mask = np.zeros(people.target.shape, dtype=np.bool)
     for target in np.unique(people.target):
         mask[np.where(people.target == target)[0][:50]] = 1
     X_people = people.data[mask]
-    y_people = people.target[mask]
     X_people = X_people / 255.
 
     from sklearn.decomposition import PCA
@@ -688,7 +685,7 @@ def show_eps_7_images():
 
     for cluster in range(max(labels) + 1):
         mask = labels == cluster
-        n_images = np.sum(mask)
+        n_images = int(np.sum(mask))
         fig, axes = plt.subplots(1, n_images, figsize=(n_images * 1.5, 4), subplot_kw={'xticks': (), 'yticks': ()})
         for image, label, ax in zip(X_people[mask], y_people[mask], axes):
             ax.imshow(image.reshape(image_shape), vmin=0, vmax=1)
