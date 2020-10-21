@@ -104,6 +104,8 @@ def demo_dataframe():
 
 
 def column_transformer():
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.preprocessing import OneHotEncoder
     read_data = load_adult_data()
     data = read_data[['age', 'workclass', 'education', 'gender', 'hours-per-week', 'occupation', 'income']]
     show_title("不同类别的类别数目，共计 42 个")
@@ -112,13 +114,18 @@ def column_transformer():
     print("gender 的类别数目 = ", np.unique(data['gender']).size)
     print("occupation 的类别数目 = ", np.unique(data['occupation']).size)
 
-    from sklearn.compose import ColumnTransformer
-    from sklearn.preprocessing import StandardScaler
+    # from sklearn.compose import ColumnTransformer
+    # ct = ColumnTransformer(
+    #     [("scaling", StandardScaler(), ['age', 'hours-per-week']),
+    #      ('onehot', OneHotEncoder(sparse=False), ['workclass', 'education', 'gender', 'occupation'])]
+    # )
+    # print(ct.named_transformers_.onehot) # make_column_transformer() 函数没有定义
 
-    from sklearn.preprocessing import OneHotEncoder
-    ct = ColumnTransformer(
-        [("scaling", StandardScaler(), ['age', 'hours-per-week']),
-         ('onehot', OneHotEncoder(sparse=False), ['workclass', 'education', 'gender', 'occupation'])]
+    # 更为简洁的列转换函数
+    from sklearn.compose import make_column_transformer
+    ct = make_column_transformer(
+        (StandardScaler(), ['age', 'hours-per-week']),
+        (OneHotEncoder(sparse=False), ['workclass', 'education', 'gender', 'occupation'])
     )
 
     from sklearn.linear_model import LogisticRegression
@@ -137,8 +144,6 @@ def column_transformer():
 
     X_test_trans = ct.transform(X_test)
     print("测试集的精度：{:.2f}".format(log_reg.score(X_test_trans, y_test)))
-
-    print(ct.named_transformers_.onehot)
     pass
 
 
