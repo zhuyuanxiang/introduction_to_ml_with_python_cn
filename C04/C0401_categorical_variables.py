@@ -26,8 +26,7 @@ def one_hot_encode():
 
     # 1. 检查字符串编码的分类数据
     # 使用pandas的Series数据类型（Series是DataFrame中单列对应的数据类型）的value_counts()函数
-    print('-' * 20)
-    print("显示gender字段的唯一值及其出现的次数：")
+    show_subtitle("显示gender字段的唯一值及其出现的次数：")
     print(data.gender.value_counts())
 
     # 使用get_dummies()自动变换所有具有对象类型（比如字符串）的列或者所有分类的列。
@@ -71,22 +70,25 @@ def one_hot_encode():
 # 4.1.2. 数字可以编码分类变量
 def demo_dataframe():
     demo_df = pd.DataFrame({'Categorical Feature': ['socks', 'fox', 'socks', 'box'], 'Integer Feature': [0, 1, 2, 1]})
-    demo_df_str = demo_df.copy()
-    demo_df_str['Integer Feature'] = demo_df['Integer Feature'].astype(str)  # 转换成str类型
-    demo_df_dummies = pd.get_dummies(demo_df)
-    demo_df_str_dummies = pd.get_dummies(demo_df_str)
     show_title("表4-4：包含分类字符串特征和整数特征的数据框")
     print('-' * 40)
     print(demo_df)
     print('-' * 40)
+
+    demo_df_str = demo_df.copy()
+    demo_df_str['Integer Feature'] = demo_df['Integer Feature'].astype(str)  # 转换成str类型
     show_title("表4-4-str：包含分类字符串特征和整数字符串特征的数据框")
     print('-' * 40)
     print(demo_df_str)
     print('-' * 40)
+
+    demo_df_dummies = pd.get_dummies(demo_df)
     show_title("表4-5：表4-4中数据的One-Hot编码版本，整数特征不变")
     print('-' * 40)
     print(demo_df_dummies)
     print('-' * 40)
+
+    demo_df_str_dummies = pd.get_dummies(demo_df_str)
     show_title("表4-5：表4-4-str中数据的One-Hot编码版本，整数字符串特征也同时编码")
     print('-' * 40)
     print(demo_df_str_dummies)
