@@ -1,6 +1,6 @@
 {
-    "python.pythonPath": "C:\\ProgramData\\Anaconda3\\envs\\DataAnalysisBak\\python.exe",
     "python.dataScience.jupyterServerURI": "local",
-    "python.envFile": "${workspaceFolder}/.vscode/prod.env",
-    "python.globalModuleInstallation": true
+    "python.globalModuleInstallation": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.terminal.activateEnvironment": true
 }
