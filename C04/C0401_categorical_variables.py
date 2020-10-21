@@ -97,10 +97,55 @@ def demo_dataframe():
     from tabulate import tabulate
     print(tabulate(demo_df_str_dummies))
 
+    from sklearn.preprocessing import OneHotEncoder
+    ohe = OneHotEncoder(sparse=False)
+    show_title("OneHot 编码")
+    print(ohe.fit_transform(demo_df))
+
+
+def column_transformer():
+    read_data = load_adult_data()
+    data = read_data[['age', 'workclass', 'education', 'gender', 'hours-per-week', 'occupation', 'income']]
+    show_title("不同类别的类别数目，共计 42 个")
+    print("workclass 的类别数目 = ", np.unique(data['workclass']).size)
+    print("education 的类别数目 = ", np.unique(data['education']).size)
+    print("gender 的类别数目 = ", np.unique(data['gender']).size)
+    print("occupation 的类别数目 = ", np.unique(data['occupation']).size)
+
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import StandardScaler
+
+    from sklearn.preprocessing import OneHotEncoder
+    ct = ColumnTransformer(
+        [("scaling", StandardScaler(), ['age', 'hours-per-week']),
+         ('onehot', OneHotEncoder(sparse=False), ['workclass', 'education', 'gender', 'occupation'])]
+    )
+
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.model_selection import train_test_split
+    data_features = data.drop('income', axis=1)
+    X_train, X_test, y_train, y_test = train_test_split(data_features, data.income, random_state=0)
+    ct.fit(X_train)
+    X_train_trans = ct.transform(X_train)
+    print(X_train_trans.shape)
+    from tabulate import tabulate
+    print(tabulate(X_train[:10]))
+    print(tabulate(X_train_trans[:10]))
+
+    log_reg = LogisticRegression(max_iter=1000)
+    log_reg.fit(X_train_trans, y_train)
+
+    X_test_trans = ct.transform(X_test)
+    print("测试集的精度：{:.2f}".format(log_reg.score(X_test_trans, y_test)))
+
+    print(ct.named_transformers_.onehot)
+    pass
+
 
 if __name__ == "__main__":
     # 4.1.1 One-Hot编码（虚拟变量）
     # one_hot_encode()
-    demo_dataframe()
+    # demo_dataframe()
+    column_transformer()
     beep_end()
     show_figures()
