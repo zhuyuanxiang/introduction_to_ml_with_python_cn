@@ -29,12 +29,12 @@ def single_variable_nonlinear_transform():
     y = np.dot(X_org, w)
 
     bins = np.bincount(X[:, 0])
-    print('特征表示数目统计：\n{}'.format(bins[:40]))
+    print('每个特征出现的次数：\n{}'.format(bins[:40]))
 
     plt.figure()
     plt.bar(range(len(bins)), bins)
     plt.xlabel('值')
-    plt.ylabel('特征表示的数目')
+    plt.ylabel('每个特征出现的次数')
     plt.suptitle("图4-7：X[:,0]特征取值的直方图")
 
     # 这样的泊松分布数据很难处理！
@@ -47,7 +47,7 @@ def single_variable_nonlinear_transform():
     show_title("泊松分布数据使用岭回归模型来拟合")
     print('测试集的得分 {:.3f}'.format(Ridge().fit(X_train, y_train).score(X_test, y_test)))
 
-    # 应用对数变换后，可能有用
+    # 应用对数变换有效（因为数据本身就是基于高斯分布使用指数函数生成的）
     X_train_log = np.log(X_train + 1)
     X_test_log = np.log(X_test + 1)
 
@@ -58,6 +58,7 @@ def single_variable_nonlinear_transform():
     plt.suptitle("图4-8：对X[:,0]特征取值进行对数变换后的直方图")
 
     # 再使用岭回归模型学习数据，拟合效果变好。（理解：将数据转换为高斯分布，因为岭回归就是基于L2正则的最小二乘法）
+    # 所有的线性模型对于高斯分布的数据效果都比较好
     show_title("应用对数变换后的泊松分布数据使用岭回归模型来拟合")
     print('测试集的得分 {:.3f}'.format(Ridge().fit(X_train_log, y_train).score(X_test_log, y_test)))
 
