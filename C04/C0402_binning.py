@@ -85,7 +85,7 @@ def compare_linear_model_decision_tree():
 # 对于特定的数据集，如果数据集大、维度高，则可以使用线性模型，
 # 但是某些特征与输出的关系是非线性的，就可以使用分箱提高建模能力
 # 增加训练数据集的数目，可以提高模型的精度
-def data_binning():
+def numpy_data_binning():
     for train_number in [100, 150, 200]:
         # 准备训练数据，有噪声的正弦波
         from mglearn.datasets import make_wave
@@ -174,12 +174,55 @@ def data_binning():
             pass
 
 
+def scikit_data_binning():
+    train_number = 100
+    from mglearn.datasets import make_wave
+    X_train, y_train = make_wave(n_samples=train_number)
+
+    from sklearn.preprocessing import KBinsDiscretizer
+    show_title("使用稀疏数组返回封箱后的数据")
+    kb = KBinsDiscretizer(n_bins=10, strategy='uniform')
+    kb.fit(X_train)
+    print("bin edges: \n", kb.bin_edges_)
+    X_binned = kb.transform(X_train)
+    print("X_binned 数据类别（稀疏数组）：", type(X_binned))
+    print("封箱前的前十条数据：\n", X_train[:10])
+    print("封箱后的前十条数据：\n", X_binned[:10])
+    print("封箱后的前十条数据转化为数组：\n", X_binned[:10].toarray())
+
+    show_title("使用OneHot编码返回封箱后的数据")
+    kb = KBinsDiscretizer(n_bins=10, strategy='uniform', encode='onehot-dense')
+    kb.fit(X_train)
+    X_binned = kb.transform(X_train)
+    print("封箱前的前十条数据：\n", X_train[:10])
+    print("封箱后的前十条数据：\n", X_binned[:10])
+
+    line = np.linspace(-3, 3, 1000, endpoint=False).reshape(-1, 1)
+    line_binned = kb.transform(line)
+
+    from sklearn.linear_model import LinearRegression
+    line_reg = LinearRegression().fit(X_binned, y_train)
+    plt.plot(line, line_reg.predict(line_binned), label='linear regression binned')
+
+    from sklearn.tree import DecisionTreeRegressor
+    dt_reg = DecisionTreeRegressor(min_samples_split=3).fit(X_binned, y_train)
+    plt.plot(line, dt_reg.predict(line_binned), label="decision tree binned")
+
+    plt.plot(X_train[:, 0], y_train, 'o', c='k')
+    plt.vlines(kb.bin_edges_[0], -3, 3, linewidth=1, alpha=.2)
+    plt.legend(loc='best')
+    plt.xlabel('Input feature')
+    plt.ylabel("Regression output")
+    pass
+
+
 if __name__ == "__main__":
     # 图4-1：比较线性回归和决策树
     # compare_linear_model_decision_tree()
 
     # 使用特征分箱（binning，也叫离散化，discretization）可以让线性模型在连续数据上更强大
-    data_binning()
+    # numpy_data_binning()
+    scikit_data_binning()
 
     beep_end()
     show_figures()
