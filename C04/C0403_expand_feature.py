@@ -294,14 +294,17 @@ def add_new_feature_in_boston():
 
     # 提取多项式特征和交互特征，多项式特征的最高幂次数为2
     from sklearn.preprocessing import PolynomialFeatures
+    poly = PolynomialFeatures(degree=2).fit(X_train)
+    X_train_poly = poly.transform(X_train)
+    X_test_poly = poly.transform(X_test)
     poly = PolynomialFeatures(degree=2).fit(X_train_scaled)
-    X_train_poly = poly.transform(X_train_scaled)
-    X_test_poly = poly.transform(X_test_scaled)
+    X_train_scaled_poly = poly.transform(X_train_scaled)
+    X_test_scaled_poly = poly.transform(X_test_scaled)
 
     show_title("为 Boston 数据集增加特征")
     print('原始训练数据的形状: {}'.format(X_train.shape))
     print('缩放过的原始训练数据的形状: {}'.format(X_train_scaled.shape))
-    print('生成多项式特征和交互特征的缩放过后原始训练数据的形状: {}'.format(X_train_poly.shape))
+    print('生成多项式特征和交互特征的缩放过后原始训练数据的形状: {}'.format(X_train_scaled_poly.shape))
     print('-' * 50)
     print('多项式特征的数量:{}'.format(len(poly.get_feature_names())))
     print('多项式特征的名称:{}'.format(poly.get_feature_names()))
@@ -311,29 +314,41 @@ def add_new_feature_in_boston():
     from sklearn.linear_model import Ridge
     number_title = "Ridge训练不同特征数据的对比"
     show_title(number_title)
-    ridge_scaled = Ridge().fit(X_train_scaled, y_train)
-    print('缩放过的数据的评分: {:.3f}'.format(ridge_scaled.score(X_test_scaled, y_test)))
-    ridge_poly = Ridge().fit(X_train_poly, y_train)
-    print('生成多项式特征和交互特征的缩放过的数据的评分: {:.3f}'.format(ridge_poly.score(X_test_poly, y_test)))
+    ridge = Ridge().fit(X_train, y_train)
+    print("原始数据的模型精度: {:.3f}".format(ridge.score(X_test, y_test)))
+    ridge = Ridge().fit(X_train_poly, y_train)
+    print("原始数据，使用交互特征的模型精度: {:.3f}".format(ridge.score(X_test_poly, y_test)))
+    ridge = Ridge().fit(X_train_scaled, y_train)
+    print("变换尺度后的，没有交互特征的模型精度: {:.3f}".format(ridge.score(X_test_scaled, y_test)))
+    ridge = Ridge().fit(X_train_scaled_poly, y_train)
+    print("变换尺度后的，使用交互特征的模型精度: {:.3f}".format(ridge.score(X_test_scaled_poly, y_test)))
     print("结论：增加交互特征后，精确度会提高")
 
     # 对比缩放后的数据与增加了特征的数据上在随机森林 RandomForest 上的精确度，变换特征后，性能反而会下降（可能是变换特征并非原始特征）
     from sklearn.ensemble import RandomForestRegressor
     number_title = "RandomForest 训练不同特征数据的对比"
     show_title(number_title)
-    rf_scaled = RandomForestRegressor(n_estimators=100).fit(X_train_scaled, y_train)
-    print('缩放过的数据的评分: {:.3f}'.format(rf_scaled.score(X_test_scaled, y_test)))
-    rf_poly = RandomForestRegressor(n_estimators=100).fit(X_train_poly, y_train)
-    print('生成多项式特征和交互特征的缩放过的数据的评分: {:.3f}'.format(rf_poly.score(X_test_poly, y_test)))
+    rf = RandomForestRegressor(n_estimators=100).fit(X_train, y_train)
+    print("原始数据的模型精度: {:.3f}".format(rf.score(X_test, y_test)))
+    rf = RandomForestRegressor(n_estimators=100).fit(X_train_poly, y_train)
+    print("原始数据，使用交互特征的模型精度: {:.3f}".format(rf.score(X_test_poly, y_test)))
+    rf = RandomForestRegressor(n_estimators=100).fit(X_train_scaled, y_train)
+    print("变换尺度后的，没有交互特征的模型精度: {:.3f}".format(rf.score(X_test_scaled, y_test)))
+    rf = RandomForestRegressor(n_estimators=100).fit(X_train_scaled_poly, y_train)
+    print("变换尺度后的，使用交互特征的模型精度: {:.3f}".format(rf.score(X_test_scaled_poly, y_test)))
     print("结论：增加交互特征后，精确度可能会降低（随机初始化，结果会不同）")
 
     from sklearn.ensemble import GradientBoostingRegressor
     number_title = "GradientBoostingRegressor 训练不同特征数据的对比"
     show_title(number_title)
-    gbrt_scaled = GradientBoostingRegressor(n_estimators=100).fit(X_train_scaled, y_train)
-    print('缩放过的数据的评分: {:.3f}'.format(gbrt_scaled.score(X_test_scaled, y_test)))
-    gbrt_poly = GradientBoostingRegressor(n_estimators=100).fit(X_train_poly, y_train)
-    print('生成多项式特征和交互特征的缩放过的数据的评分: {:.3f}'.format(gbrt_poly.score(X_test_poly, y_test)))
+    gbrt = GradientBoostingRegressor(n_estimators=100).fit(X_train, y_train)
+    print("原始数据的模型精度: {:.3f}".format(gbrt.score(X_test, y_test)))
+    gbrt = GradientBoostingRegressor(n_estimators=100).fit(X_train_poly, y_train)
+    print("原始数据，使用交互特征的模型精度: {:.3f}".format(gbrt.score(X_test_poly, y_test)))
+    gbrt = GradientBoostingRegressor(n_estimators=100).fit(X_train_scaled, y_train)
+    print("变换尺度后的，没有交互特征的模型精度: {:.3f}".format(gbrt.score(X_test_scaled, y_test)))
+    gbrt = GradientBoostingRegressor(n_estimators=100).fit(X_train_scaled_poly, y_train)
+    print("变换尺度后的，使用交互特征的模型精度: {:.3f}".format(gbrt.score(X_test_scaled_poly, y_test)))
     print("结论：增加交互特征后，精确度可能会降低（随机初始化，结果会不同）")
     pass
 
