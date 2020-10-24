@@ -61,7 +61,8 @@ def eval_on_features(feature_values, target_values, regressor):
     y_train, y_test = target_values[:n_train], target_values[n_train:]
 
     regressor.fit(X_train, y_train)
-    print("{}'s test-set R^2: {:.2f}".format(type(regressor).__name__, regressor.score(X_test, y_test)))
+    print("{}'s 训练集 R^2: {:.2f}".format(type(regressor).__name__, regressor.score(X_train, y_train)))
+    print("{}'s 测试集 R^2: {:.2f}".format(type(regressor).__name__, regressor.score(X_test, y_test)))
 
     y_pred = regressor.predict(X_test)
     y_pred_train = regressor.predict(X_train)
@@ -85,12 +86,14 @@ def train_data(X, y, number_title):
     from sklearn.linear_model import Lasso, Ridge
     from sklearn.linear_model import LinearRegression
     from sklearn.linear_model import LogisticRegression
-    # “随机森林”的拟合效果最好，但是预测效果都不好
+    # “随机森林”的拟合效果最好
+    # “LogisticRegression”的效果不好，因为这个模型适用于分类问题，而不是回归问题
     for clf, title in [(RandomForestRegressor(n_estimators=100, random_state=seed), "随机森林"),
                        (Ridge(), "岭回归"),
                        (Lasso(), "拉索回归"),
                        (LinearRegression(), "线性回归"),
                        (LogisticRegression(solver='lbfgs', multi_class='auto'), "Logistic回归")]:
+        show_title(title)
         eval_on_features(X, y, clf)
         plt.suptitle(number_title.format(title))
         pass
@@ -188,7 +191,9 @@ def feature_posix_weekday_everytime_one_hot_poly():
     from sklearn.linear_model import Lasso, Ridge
     from sklearn.linear_model import LinearRegression
     from sklearn.linear_model import LogisticRegression
-    # “随机森林”的拟合效果最好，但是预测效果都不好
+    # “随机森林”的拟合效果最好
+    # “线性模型”的预测效果最好，因为构造的特征更符合线性模型的需要
+    # “LogisticRegression”的效果很差，因为模型更适合分类问题
     for clf, title in [(RandomForestRegressor(n_estimators=100, random_state=seed), "随机森林"),
                        (Ridge(), "岭回归"),
                        (Lasso(), "拉索回归"),
@@ -233,7 +238,7 @@ def main():
     # 使用周期为星期几和每天的时刻作为先验知识做出的预测
     # feature_posix_weekday_everytime()
     # 使用One-Hot编码过的一周的星期几和每天的时刻作为先验知识做出的预测
-    # feature_posix_weekday_everytime_one_hot()
+    feature_posix_weekday_everytime_one_hot()
     # 将 One-Hot 编码的特征映射为多项式特征作为先验知识做出的预测
     # feature_posix_weekday_everytime_one_hot_poly()
     pass
