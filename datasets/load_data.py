@@ -14,11 +14,11 @@
 @Desc       :   
 @理解：
 """
-import numpy as np
 import sklearn
 from sklearn.model_selection import train_test_split
 
 from config import seed
+from preamble import *
 
 
 # ----------------------------------------------------------------------
@@ -97,4 +97,19 @@ def load_train_test_faces():
     # 将灰度值缩放到[0,1]之间，而不是[0,255]之间，可以得到更好的数据稳定性
     X_people = X_people / 255.
     return train_test_split(X_people, y_people, stratify=y_people, random_state=seed)
+
+
 # ----------------------------------------------------------------------
+def load_adult_data():
+    # adult.data 中没有 header，因此 header=None，使用 names 显式提供数据列的名称
+    return pd.read_csv('../data/adult.data', header=None, index_col=False,
+                       names=['age', 'workclass', 'fnlwgt', 'education', 'education-num',
+                              'marital-status', 'occupation', 'relationship', 'race', 'gender',
+                              'capital-gain', 'capital-loss', 'hours-per-week', 'native-country', 'income'])
+
+
+# ----------------------------------------------------------------------
+def load_train_test_blobs():
+    from sklearn.datasets import make_blobs
+    X, y = make_blobs(random_state=0)
+    return train_test_split(X, y, random_state=seed)
