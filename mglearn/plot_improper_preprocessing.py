@@ -27,7 +27,7 @@ def plot_improper_processing():
                   fontdict={'fontsize': 14}, horizontalalignment="center")
         axis.text(13.5, -.3, "validation fold",
                   fontdict={'fontsize': 14}, horizontalalignment="center")
-        axis.text(17.5, -.3, "test set",
+        axis.text(17.5, -.3, "测试集",
                   fontdict={'fontsize': 14}, horizontalalignment="center")
 
     make_bracket("scaler fit", (7.5, 1.3), (7.5, 2.), 15, axes[0])
@@ -60,7 +60,7 @@ def plot_proper_processing():
                   horizontalalignment="center")
         axis.text(13.5, -.3, "validation fold", fontdict={'fontsize': 14},
                   horizontalalignment="center")
-        axis.text(17.5, -.3, "test set", fontdict={'fontsize': 14},
+        axis.text(17.5, -.3, "测试集", fontdict={'fontsize': 14},
                   horizontalalignment="center")
 
     make_bracket("scaler fit", (6, 1.3), (6, 2.), 12, axes[0])
