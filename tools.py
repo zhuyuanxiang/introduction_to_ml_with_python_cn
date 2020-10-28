@@ -33,7 +33,12 @@ def show_figures():
 
 def show_title(message):
     # 输出运行模块的标题
-    print('-' * 5, '>' + message + '<', '-' * 5)
+    print('=' * 15, '>' + message + '<', '=' * 15)
+    pass
+
+def show_subtitle(message):
+    # 输出运行模块的子标题
+    print('-' * 15, '>' + message + '<', '-' * 15)
     pass
 
 
