@@ -51,7 +51,7 @@ def plot_group_kfold():
     axes.set_yticks(np.arange(n_iter + 1) + .3)
     axes.set_yticklabels(
         ["Split %d" % x for x in range(1, n_iter + 1)] + ["Group"])
-    plt.legend([boxes[0], boxes[1]], ["Training set", "Test set"], loc=(1, .3))
+    plt.legend([boxes[0], boxes[1]], ["训练集", "测试集"], loc=(1, .3))
     plt.tight_layout()
 
 
@@ -96,15 +96,16 @@ def plot_shuffle_split():
     axes.set_yticklabels(["Split %d" % x for x in range(1, n_iter + 1)])
     # legend hacked for this random state
     plt.legend([boxes[1], boxes[0], boxes[2]], [
-               "Training set", "Test set", "Not selected"], loc=(1, .3))
+               "训练集", "测试集", "Not selected"], loc=(1, .3))
     plt.tight_layout()
 
 
 def plot_stratified_cross_validation():
-    fig, both_axes = plt.subplots(2, 1, figsize=(12, 5))
+    fig, both_axes = plt.subplots(2, 1, figsize=(12, 3))
     # plt.title("cross_validation_not_stratified")
     axes = both_axes[0]
-    axes.set_title("Standard cross-validation with sorted class labels")
+    # axes.set_title("Standard cross-validation with sorted class labels")
+    axes.set_title("基于排序后的类别标签进行标准交叉验证")
 
     axes.set_frame_on(False)
 
@@ -139,7 +140,8 @@ def plot_stratified_cross_validation():
                   i, horizontalalignment="center")
 
     ax = both_axes[1]
-    ax.set_title("Stratified Cross-validation")
+    # ax.set_title("Stratified Cross-validation")
+    ax.set_title("分层 K-折 交叉验证")
     ax.set_frame_on(False)
     ax.invert_yaxis()
     ax.set_xlim(0, n_samples + 1)
@@ -227,8 +229,8 @@ def plot_threefold_split():
     axis.set_ylim(-.1, .8)
     axis.set_xlim(-0.1, 20.1)
     axis.set_xticks([6, 13.3, 17.5])
-    axis.set_xticklabels(["training set", "validation set",
-                          "test set"], fontdict={'fontsize': 20})
+    axis.set_xticklabels(["训练集", "验证集",
+                          "测试集"], fontdict={'fontsize': 10})
     axis.tick_params(length=0, labeltop=True, labelbottom=False)
     axis.text(6, -.3, "Model fitting",
               fontdict={'fontsize': 13}, horizontalalignment="center")
