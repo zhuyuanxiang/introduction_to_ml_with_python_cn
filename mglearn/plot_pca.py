@@ -1,8 +1,7 @@
-from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import numpy as np
-
 from joblib import Memory
+from sklearn.decomposition import PCA
 
 memory = Memory(cachedir="cache")
 
@@ -75,18 +74,46 @@ def plot_pca_whitening():
     X_pca = pca.transform(X_blob)
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 10))
+    plt.suptitle("图3-8：利用PCA对数据进行白化(whiten)或球面化(sphered)处理")
     axes = axes.ravel()
 
-    axes[0].set_title("Original data")
+    axes[0].set_title("原始数据")
     axes[0].scatter(X_blob[:, 0], X_blob[:, 1], c=X_pca[:, 0], linewidths=0, s=60, cmap='viridis')
-    axes[0].set_xlabel("feature 1")
-    axes[0].set_ylabel("feature 2")
+    axes[0].set_xlabel("特征 1")
+    axes[0].set_ylabel("特征 2")
     axes[0].set_aspect('equal')
 
-    axes[1].set_title("Whitened data")
+    axes[1].set_title("白化数据")
     axes[1].scatter(X_pca[:, 0], X_pca[:, 1], c=X_pca[:, 0], linewidths=0, s=60, cmap='viridis')
-    axes[1].set_xlabel("First principal component")
-    axes[1].set_ylabel("Second principal component")
+    axes[1].set_xlabel("第一个 PCA 成分")
+    axes[1].set_ylabel("第二个 PCA 成分")
+    axes[1].set_aspect('equal')
+    axes[1].set_xlim(-3, 4)
+
+
+def plot_standard_scaler():
+    rnd = np.random.RandomState(5)
+    X_ = rnd.normal(size=(300, 2))
+    X_blob = np.dot(X_, rnd.normal(size=(2, 2))) + rnd.normal(size=2)
+
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X_blob)
+
+    fig, axes = plt.subplots(1, 2, figsize=(8, 10))
+    plt.suptitle("利用 StandScaler 对数据进行归一化处理")
+    axes = axes.ravel()
+
+    axes[0].set_title("原始数据")
+    axes[0].scatter(X_blob[:, 0], X_blob[:, 1], c=X_scaled[:, 0], linewidths=0, s=60, cmap='viridis')
+    axes[0].set_xlabel("特征 1")
+    axes[0].set_ylabel("特征 2")
+    axes[0].set_aspect('equal')
+
+    axes[1].set_title("归一化数据")
+    axes[1].scatter(X_scaled[:, 0], X_scaled[:, 1], c=X_scaled[:, 0], linewidths=0, s=60, cmap='viridis')
+    axes[1].set_xlabel("归一化的特征 1")
+    axes[1].set_ylabel("归一化的特征 2")
     axes[1].set_aspect('equal')
     axes[1].set_xlim(-3, 4)
 
