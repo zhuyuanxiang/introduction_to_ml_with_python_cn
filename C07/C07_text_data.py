@@ -13,56 +13,47 @@
 @Reference  :   《Python机器学习基础教程》, Ch07，P250
 @Desc       :   处理文本数据
 """
-import matplotlib.pyplot as plt
-import mglearn
-import numpy as np
-
-# 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf, linewidth = 200)
+from tools import *
 
 
 # 7.2 示例应用：电影评论的情感分析
 # 电影评论数据集
 def load_databases():
-    number_title = "电影评论数据集"
-    print('\n', '-' * 5, number_title, '-' * 5)
-
     # 解压缩数据后，先删除data/aclImdb/train/下的unsup目录及其文件，这个是用于无监督学习的无标签文档。
     from sklearn.datasets import load_files
     reviews_train = load_files("../data/aclImdb/train/")
     text_train, y_train = reviews_train.data, reviews_train.target
-    print("Type of text_train: {}".format(type(text_train)))
-    print("Length of text_train: {}".format(len(text_train)))
+    show_title("电影评论训练数据集")
+    print("text_train 的类型: {}".format(type(text_train)))
+    print("text_train 的长度: {}".format(len(text_train)))
     print("原始的 text_train[1]:")
     print(text_train[1])
 
     # 删除数据中与内容无关的部分。例如：HTML换行符（<br />）。
     text_train = [doc.replace(b"<br />", b" ") for doc in text_train]
-    print('-' * 50)
-    print("处理过的 text_train[1]:")
+    show_subtitle("删除数据中与内容无关的部分。处理过的 text_train[1]")
     print(text_train[1])
 
-    print('-' * 50)
-    print("训练数据集 中样本的类别: {}".format(np.unique(y_train)))
-    print("训练数据集 中每个类别的数目： {}".format(np.bincount(y_train)))
+    show_subtitle("训练数据集")
+    print("样本的类别: {}".format(np.unique(y_train)))
+    print("每个类别的数目： {}".format(np.bincount(y_train)))
 
     reviews_test = load_files("../data/aclImdb/test/")
     text_test, y_test = reviews_test.data, reviews_test.target
-    print('=' * 50)
-    print("Type of text_test: {}".format(type(text_test)))
-    print("Length of text_test: {}".format(len(text_test)))
+    show_title("电影评论测试数据集")
+    print("text_test 的类型: {}".format(type(text_test)))
+    print("text_test 的长度: {}".format(len(text_test)))
     print("原始的 text_test[1]:")
     print(text_test[1])
 
     # 测试数据不需要处理，结果也是一样的，估计词袋中没有的词就直接放弃了
     text_test = [doc.replace(b"<br />", b" ") for doc in text_test]
-    print('-' * 50)
-    print("处理过的 text_test[1]:")
+    print("删除数据中与内容无关的部分。处理过的 text_test[1]:")
     print(text_test[1])
 
-    print('-' * 50)
-    print("测试数据集 中样本的类别： {}".format(np.unique(y_test)))
-    print("测试数据集 中每个类别的数目： {}".format(np.bincount(y_test)))
+    show_subtitle("测试数据集")
+    print("样本的类别： {}".format(np.unique(y_test)))
+    print("每个类别的数目： {}".format(np.bincount(y_test)))
 
 
 def load_data():
@@ -87,29 +78,29 @@ def show_vectorizer_feature(X_train, feature_names):
     print(feature_names[::2000])
 
 
-def grid_search_logistic_regression(X_train, y_train, X_test, y_test, classifier = None, param_grid = None, cv = 5):
+def grid_search_logistic_regression(X_train, y_train, X_test, y_test, classifier=None, param_grid=None, cv=5):
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import GridSearchCV
     if classifier is None:
-        classifier = LogisticRegression(solver = 'lbfgs', max_iter = 10000)
+        classifier = LogisticRegression(solver='lbfgs', max_iter=10000)
     if param_grid is None:
         param_grid = {'C': [0.001, 0.01, 0.1, 1, 10]}
 
-    grid_search = GridSearchCV(classifier, param_grid, cv = cv, n_jobs = 3, iid = True)
+    grid_search = GridSearchCV(classifier, param_grid, cv=cv, n_jobs=-1, iid=True)
     grid_search.fit(X_train, y_train)
-    print('=' * 50)
-    print("基于网格搜索的 LogisticRegression 模型学习的最佳交叉验证的得分: {:.2f}".format(grid_search.best_score_))
-    print("基于网格搜索的 LogisticRegression 模型学习的最佳交叉验证的参数: ", grid_search.best_params_)
+    show_subtitle("基于网格搜索的 LogisticRegression 模型学习的交叉验证")
+    print("最佳得分: {:.3f}".format(grid_search.best_score_))
+    print("最佳参数: ", grid_search.best_params_)
     print('-' * 50)
-    print("基于网格搜索的 LogisticRegression 模型学习的测试集上的得分：{:.2f}".format(grid_search.score(X_test, y_test)))
+    print("测试集上的得分：{:.3f}".format(grid_search.score(X_test, y_test)))
     return grid_search
 
 
 def cross_validation_logistic_regression(X_train, y_train):
     from sklearn.model_selection import cross_val_score
     from sklearn.linear_model import LogisticRegression
-    scores = cross_val_score(LogisticRegression(solver = 'lbfgs', max_iter = 10000),
-                             X_train, y_train, cv = 5, n_jobs = 3)
+    scores = cross_val_score(LogisticRegression(solver='lbfgs', max_iter=10000),
+                             X_train, y_train, cv=5, n_jobs=3)
     print('=' * 50)
     print("基于交叉验证的 LogisticRegression 模型学习的平均精确度: {:.2f}".format(np.mean(scores)))
     return LogisticRegression
@@ -117,8 +108,7 @@ def cross_validation_logistic_regression(X_train, y_train):
 
 # 7.3 将文本数据转换为数值表示（词袋）
 def transform_to_bag_of_words():
-    number_title = "将文本数据转换为数值表示（词袋）"
-    print('\n', '-' * 5, number_title, '-' * 5)
+    show_title("将文本数据转换为数值表示（词袋）")
 
     bards_words = ["The fool doth think he is wise", "but the wise man knows himself to be a fool"]
 
@@ -134,16 +124,20 @@ def transform_to_bag_of_words():
     # bag-of-words 表示保存在一个SciPy的稀疏矩阵中。
     print('=' * 50)
     bag_of_words = vectorizer.transform(bards_words)
-    print("bag_of_words: {}")
+    print("词袋（bag_of_words）: {}")
     print(repr(bag_of_words))
+    print("词袋的稠密表示")
     print("Dense representation of bag_of_words: {}")
     print(bag_of_words.toarray())
+    # 函数str() 用于将值转化为适于人阅读的形式，而repr() 转化为供解释器读取的形式（如果没有等价的
+    # 语法，则会发生SyntaxError 异常） 某对象没有适于人阅读的解释形式的话， str() 会返回与repr()
+    # 等同的值。很多类型，诸如数值或链表、字典这样的结构，这2个函数都有着统一的解读方式。特别的是，字符串和
+    # 浮点数，有着不同的解读方式。
 
 
 # 7.3.2 将词袋应用于电影评论
 def bag_of_words_for_movie_reviews():
-    number_title = "将词袋应用于电影评论"
-    print('\n', '-' * 5, number_title, '-' * 5)
+    show_title("将词袋应用于电影评论")
 
     # 运行时间较长
     text_train, y_train, text_test, y_test = load_data()
@@ -167,15 +161,14 @@ def bag_of_words_for_movie_reviews():
 
 # 删除那些不具有信息量的单词，即某些单词只出现在少量文档中，例如：数字、错误拼写的单词、生僻词等等
 def bag_of_words_for_movie_reviews_min_df():
-    number_title = "删除 不具有信息量的单词"
-    print('\n', '-' * 5, number_title, '-' * 5)
+    show_title("删除 不具有信息量的单词")
 
     # 至少出现在(min_df)5个文档的单词才被选择为特征
     # 数字的个数明显减少，某些生僻词或者拼写错误的词也都消失了。
     text_train, y_train, text_test, y_test = load_data()
 
     from sklearn.feature_extraction.text import CountVectorizer
-    vectorizer = CountVectorizer(min_df = 5)  # 至少出现在(min_df)5个文档的单词才被选择为特征
+    vectorizer = CountVectorizer(min_df=5)  # 至少出现在(min_df)5个文档的单词才被选择为特征
     vectorizer.fit(text_train)
     feature_names = vectorizer.get_feature_names()
     X_train = vectorizer.transform(text_train)
@@ -192,8 +185,7 @@ def bag_of_words_for_movie_reviews_min_df():
 
 
 def bag_of_words_for_movie_reviews_stop_words():
-    number_title = "删除 不具有信息量的单词+停用词"
-    print('\n', '-' * 5, number_title, '-' * 5)
+    show_title("删除 不具有信息量的单词+停用词")
 
     # 至少出现在(min_df)5个文档的单词才被选择为特征
     # 数字的个数明显减少，某些生僻词或者拼写错误的词也都消失了。
@@ -202,12 +194,11 @@ def bag_of_words_for_movie_reviews_stop_words():
     # 停用词的数目并不多（318个），对于特征维数的降低帮助不大，并且删除后会降低模型精度，
     # 但是可以显著提高计算速度。
     from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-    print('=' * 50)
     print("停用词的个数： {}".format(len(ENGLISH_STOP_WORDS)))
     print("Every 10th stop-word:", list(ENGLISH_STOP_WORDS)[::10])
 
     from sklearn.feature_extraction.text import CountVectorizer
-    vectorizer = CountVectorizer(min_df = 5, stop_words = 'english')  # 至少出现在(min_df)5个文档的单词才被选择为特征
+    vectorizer = CountVectorizer(min_df=5, stop_words='english')  # 至少出现在(min_df)5个文档的单词才被选择为特征
     vectorizer.fit(text_train)
     feature_names = vectorizer.get_feature_names()
     X_train = vectorizer.transform(text_train)
@@ -228,21 +219,20 @@ def bag_of_words_for_movie_reviews_max_df():
     # 停用词的数目并不多（318个），但是可以显著提高计算速度。
     # 至少出现在(min_df)5个文档的单词才被选择为特征
     # 数字的个数明显减少，某些生僻词或者拼写错误的词也都消失了。
-    number_title = "删除 不具有信息量的单词+停用词+出现在大量文档中的单词"
-    print('\n', '-' * 5, number_title, '-' * 5)
+    show_title("删除 不具有信息量的单词+停用词+出现在大量文档中的单词")
 
     # 至少出现在(min_df)5个文档的单词才被选择为特征
     # 数字的个数明显减少，某些生僻词或者拼写错误的词也都消失了。
     text_train, y_train, text_test, y_test = load_data()
 
     from sklearn.feature_extraction.text import CountVectorizer
-    vectorizer = CountVectorizer(min_df = 5, stop_words = 'english', max_df = 100)  # 至少出现在(min_df)5个文档的单词才被选择为特征
+    vectorizer = CountVectorizer(min_df=5, stop_words='english', max_df=100)  # 至少出现在(min_df)5个文档的单词才被选择为特征
     vectorizer.fit(text_train)
     feature_names = vectorizer.get_feature_names()
     X_train = vectorizer.transform(text_train)
     X_test = vectorizer.transform(text_test)
     print('=' * 50)
-    print("删除 不具有信息量的单词(min_df = 5)+停用词的训练数据集：", repr(X_train))
+    print("删除 不具有信息量的单词(min_df = 5)+信息量过大的单词（max_df = 100）+ 停用词的训练数据集：", repr(X_train))
     # <15000x18613 sparse matrix of type '<class 'numpy.int64'>'
     # 	with 381706 stored elements in Compressed Sparse Row format>
     show_vectorizer_feature(X_train, feature_names)
@@ -258,19 +248,18 @@ def bag_of_words_for_movie_reviews_max_df():
 #   - TfidfTransformer: 接受CountVectorizer生成的稀疏矩阵并将其变换
 #   - TfidfVectorizer: 接受文本数据并完成词袋特征提取与tf-idf变换。
 def bag_of_words_for_movie_reviews_tf_idf():
-    number_title = "删除停用词+使用TF-IDF缩放数据"
-    print('\n', '-' * 5, number_title, '-' * 5)
+    show_title("删除停用词+使用TF-IDF缩放数据")
 
     # 至少出现在(min_df)5个文档的单词才被选择为特征
     # 数字的个数明显减少，某些生僻词或者拼写错误的词也都消失了。
     text_train, y_train, text_test, y_test = load_data()
 
-    from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer
+    from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.pipeline import make_pipeline
     from sklearn.linear_model import LogisticRegression
     pipeline = make_pipeline(
-            TfidfVectorizer(min_df = 5, stop_words = 'english'),
-            LogisticRegression(solver = 'lbfgs', max_iter = 10000))
+        TfidfVectorizer(min_df=5, stop_words='english'),
+        LogisticRegression(solver='lbfgs', max_iter=10000))
     param_grid = {'logisticregression__C': [0.001, 0.01, 0.1, 1, 10]}
 
     grid_search = grid_search_logistic_regression(text_train, y_train, text_test, y_test, pipeline, param_grid)
@@ -280,28 +269,28 @@ def bag_of_words_for_movie_reviews_tf_idf():
     X_train = vectorizer.transform(text_train)
     print('=' * 50)
     print("TFIDF的训练数据集：", repr(X_train))
-    # <15000x20895 sparse matrix of type '<class 'numpy.float64'>'
+    # <25000x26966 sparse matrix of type '<class 'numpy.float64'>'
     # 	with 1270076 stored elements in Compressed Sparse Row format>
 
-    max_value = X_train.max(axis = 0).toarray().ravel()
+    max_value = X_train.max(axis=0).toarray().ravel()
     feature_names = np.array(vectorizer.get_feature_names())
 
     sorted_by_tfidf = max_value.argsort()
     print('=' * 50)
-    print("Number of features: {}".format(len(feature_names)))  # 20895
-    print("Features with lowest tfidf:")
+    print("特征数目: {}".format(len(feature_names)))  # 20895
+    print("由低到高排序 tfidf 值的前 20个特征:")
     print(feature_names[sorted_by_tfidf[:20]])
-    print("Features with highest tfidf:")
+    print("由高到低排序 tfidf 值的前 20个特征:")
     print(feature_names[sorted_by_tfidf[-20:]])
 
     sorted_by_idf = np.argsort(vectorizer.idf_)
     print('-' * 50)
-    print("Features with lowest idf:")
+    print("由低到高排序 idf 值的前 100 个特征:")
     print(feature_names[sorted_by_idf[:100]])
 
     # 7.6 研究模型的系数
     coefficient = grid_search.best_estimator_.named_steps['logisticregression'].coef_
-    mglearn.tools.visualize_coefficients(coefficient, feature_names, n_top_features = 40)
+    mglearn.tools.visualize_coefficients(coefficient, feature_names, n_top_features=40)
     plt.suptitle("图7-2：在TF-IDF特征上训练的Logistic回归的最大系数和最小系数\n"
                  "左侧的负系数属于模型找到的表示负面评论的单词" +
                  '-' * 10 +
@@ -311,17 +300,15 @@ def bag_of_words_for_movie_reviews_tf_idf():
 # 7.7 多个单词的词袋（N元分词）
 # 在Vectorizer类中设置ngram_range参数即可，参数输入一个元组，表示词例序列的（最小长度，最大长度）。
 def transform_to_n_gram():
-    number_title = "多个单词的词袋（N元分词）"
-    print('\n', '-' * 5, number_title, '-' * 5)
-
     bards_words = ["The fool doth think he is wise", " but the wise man knows himself to be a fool"]
 
     # 构建单词表
+    show_title("多个单词的词袋（N元分词）")
     from sklearn.feature_extraction.text import CountVectorizer
     for ngram_range in [(1, 1), (2, 2), (1, 3)]:
         print('=' * 50)
         print("ngram_range= {}".format(ngram_range))
-        vectorizer = CountVectorizer(ngram_range = ngram_range)
+        vectorizer = CountVectorizer(ngram_range=ngram_range)
         vectorizer.fit(bards_words)
         print('-' * 50)
         print("单词表的大小: {}".format(len(vectorizer.vocabulary_)))
@@ -342,33 +329,31 @@ def transform_to_n_gram():
 def bag_of_words_for_movie_reviews_n_gram():
     # 计算时间非常长。。。
     # 可以将data下的数据减少到每个目录7500个文件，就可以快速看到结果了。
-    number_title = "基于N元语法模型建立电影评论数据集的词袋"
-    print('\n', '-' * 5, number_title, '-' * 5)
-
+    show_title("基于N元语法模型建立电影评论数据集的词袋")
     # 至少出现在(min_df)5个文档的单词才被选择为特征
     # 数字的个数明显减少，某些生僻词或者拼写错误的词也都消失了。
     text_train, y_train, text_test, y_test = load_data()
 
-    from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer
+    from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.pipeline import make_pipeline
     from sklearn.linear_model import LogisticRegression
     pipeline = make_pipeline(
-            TfidfVectorizer(min_df = 5, stop_words = 'english'),
-            LogisticRegression(solver = 'lbfgs', max_iter = 10000))
+        TfidfVectorizer(min_df=5, stop_words='english'),
+        LogisticRegression(solver='lbfgs', max_iter=10000))
     param_grid = {
-            'logisticregression__C': [0.001, 0.01, 0.1, 1, 10, 100],
-            # 'logisticregression__C': [100],
-            # 'tfidfvectorizer__ngram_range': [(1, 3)]
-            'tfidfvectorizer__ngram_range': [(1, 1), (1, 2), (1, 3)]
+        'logisticregression__C': [0.001, 0.01, 0.1, 1, 10, 100],
+        'tfidfvectorizer__ngram_range': [(1, 1), (1, 2), (1, 3)]
+        # 'logisticregression__C': [100],
+        # 'tfidfvectorizer__ngram_range': [(1, 3)]
     }
     grid_search = grid_search_logistic_regression(text_train, y_train, text_test, y_test, pipeline, param_grid)
     # 0.89, 0.87
 
     scores = grid_search.cv_results_['mean_test_score'].reshape(-1, 3).T
     heatmap = mglearn.tools.heatmap(
-            scores, xlabel = 'C', ylabel = 'ngram_range', cmap = 'viridis', fmt = '%.3f',
-            xticklabels = param_grid['logisticregression__C'],
-            yticklabels = param_grid['tfidfvectorizer__ngram_range']
+        scores, xlabel='C', ylabel='ngram_range', cmap='viridis', fmt='%.3f',
+        xticklabels=param_grid['logisticregression__C'],
+        yticklabels=param_grid['tfidfvectorizer__ngram_range']
     )
     plt.colorbar(heatmap)
     plt.suptitle("图7-3：交叉验证平均精度作为参数ngram_range和C的函数的热图可视化\n"
@@ -379,21 +364,48 @@ def bag_of_words_for_movie_reviews_n_gram():
     vectorizer = grid_search.best_estimator_.named_steps['tfidfvectorizer']
     feature_names = np.array(vectorizer.get_feature_names())
     coefficient = grid_search.best_estimator_.named_steps['logisticregression'].coef_
-    mglearn.tools.visualize_coefficients(coefficient, feature_names, n_top_features = 40)
+    mglearn.tools.visualize_coefficients(coefficient, feature_names, n_top_features=40)
     plt.suptitle("图7-4：同时使用TF-IDF缩放与一元分词、二元分词和三元分词时的最重要的特征\n"
                  "左侧的负系数属于模型找到的表示负面评论的单词，"
                  "右侧的正系数属于模型找到的表示正面评论的单词")
+
+
+# 基于N元语法模型建立电影评论数据集的词袋
+def bag_of_words_for_movie_reviews_3_gram():
+    # 计算时间非常长。。。
+    # 可以将data下的数据减少到每个目录7500个文件，就可以快速看到结果了。
+    show_title("基于3元语法模型建立电影评论数据集的词袋")
+    # 至少出现在(min_df)5个文档的单词才被选择为特征
+    # 数字的个数明显减少，某些生僻词或者拼写错误的词也都消失了。
+    text_train, y_train, text_test, y_test = load_data()
+
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.pipeline import make_pipeline
+    from sklearn.linear_model import LogisticRegression
+    pipeline = make_pipeline(
+        TfidfVectorizer(min_df=5, stop_words='english'),
+        LogisticRegression(solver='lbfgs', max_iter=10000))
+    param_grid = {
+        'logisticregression__C': [100],
+        'tfidfvectorizer__ngram_range': [(1, 3)]
+    }
+    grid_search = grid_search_logistic_regression(text_train, y_train, text_test, y_test, pipeline, param_grid)
+    # 0.89, 0.87
+
+    # # 提取特征的名称和系数
+    vectorizer = grid_search.best_estimator_.named_steps['tfidfvectorizer']
+    feature_names = np.array(vectorizer.get_feature_names())
+    coefficient = grid_search.best_estimator_.named_steps['logisticregression'].coef_
 
     # 三元分词特征可视化
     # ！ 注意：如果系统最佳的是二元分词，那么就得不到结果
     mask = np.array([len(feature.split(" ")) for feature in feature_names]) == 3
     mask_coefficient = coefficient.ravel()[mask]
     mask_feature_names = feature_names[mask]
-    if len(mask_feature_names) != 0:
-        mglearn.tools.visualize_coefficients(mask_coefficient, mask_feature_names, n_top_features = 40)
-        plt.suptitle("图7-5：模型中三元分词的最重要的特征\n"
-                     "左侧的负系数属于模型找到的表示负面评论的单词，"
-                     "右侧的正系数属于模型找到的表示正面评论的单词")
+    mglearn.tools.visualize_coefficients(mask_coefficient, mask_feature_names, n_top_features=40)
+    plt.suptitle("图7-5：模型中三元分词的最重要的特征\n"
+                 "左侧的负系数属于模型找到的表示负面评论的单词，"
+                 "右侧的正系数属于模型找到的表示正面评论的单词")
 
 
 # 7.8 词干提取和词形还原
@@ -406,42 +418,43 @@ def word_normalization():
     # 例如：was和am这类be动词会转换为be
     import spacy, nltk
 
-    number_title = "词干提取(NLTK)和词形还原(SPACY)"
-    print('\n', '-' * 5, number_title, '-' * 5)
-
     # 加载spacy的英语模型
     # python -m spacy download en
     # 我下载时没有使用管理员权限，所以没有创建en的快捷方式，只好使用语言包的命名“en_core_web_sm”
+    # 2020-11-1：无法正常下载，可以依照下面的步骤下载
+    # .condarc 文件中 channels: 下加入 https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+    # 使用 conda install -c conda-forge spacy-model-en_core_web_sm 安装
     en_nlp = spacy.load('en_core_web_sm')
     # nltk的Porter词干提取器
     stemmer = nltk.stem.PorterStemmer()
 
     # 定义函数用于对比spacy中的词形还原与nltk中的词干提取
     def compare_normalization(doc):
+        """对比两种归一化的效果"""
         # 在spacy中对文档进行分词
         doc_spacy = en_nlp(doc)
         # 输出spacy还原的词形
         # 1.7.5以上的版本的spacy会把'our'还原成'-PRON-'
-        # 注："I'm"在逗号后面必须插入空格，否则无法分析。
-        print('=' * 50)
+        show_subtitle("原始文档")
         print(doc)
-        print('-' * 50)
-        print("Lemmatization:")
+        show_subtitle("词形还原（Lemmatization）")
         print([token.lemma_ for token in doc_spacy])
         # 输出Porter基于spacy分解的单词提取的词干
-        print('-' * 20)
-        print("Stemming:")
+        show_subtitle("词干提取（Stemming）")
         print([stemmer.stem(token.norm_.lower()) for token in doc_spacy])
         pass
 
     # 注意下面在分析“I'm”时的区别。
-    print("--> “,”与“I'm”之间必须加空格才能正确分割")
+    show_title("对比 词干提取(NLTK)和词形还原(SPACY) 两种归一化的区别")
 
+    # 注："I'm"在逗号后面必须插入空格，否则无法分析。
     original_text = u"Our meeting today was worse than yesterday,I'm scared of meeting the clients tomorrow."
     compare_normalization(original_text)
 
     original_text = u"Our meeting today was worse than yesterday, I'm scared of meeting the clients tomorrow."
     compare_normalization(original_text)
+
+    print("注意：“,”与“I'm”之间必须加空格才能正确分割")
     pass
 
 
@@ -450,17 +463,16 @@ def word_normalization():
 
 # 了解正则表达式
 def test_regularization():
-    number_title = "了解正则表达式"
-    print('\n', '-' * 5, number_title, '-' * 5)
+    show_title("了解正则表达式")
 
     import re
     regexp = re.compile('(?u)\\b\\w\\w+\\b')
 
-    def re_compile_regular(tmp_string):
+    def re_compile_regular(tmp_str):
         print('=' * 50)
-        print(tmp_string)
+        print(tmp_str)
         print('-' * 50)
-        print(regexp.findall(tmp_string))
+        print(regexp.findall(tmp_str))
         print()
         pass
 
@@ -484,36 +496,33 @@ def test_regularization():
 def sklearn_lemmatization():
     # 计算时间非常长，运行前注意！
     # 主要计算时间用在大量单词的词形还原
-    number_title = "基于Scikit-Learn 实现词形还原"
-    print('\n', '-' * 5, number_title, '-' * 5)
-
     text_train, y_train, text_test, y_test = load_data()
 
     import spacy, re
     regexp = re.compile('(?u)\\b\\w\\w+\\b')
-    en_nlp = spacy.load('en_core_web_sm')
+    en_nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
     old_tokenizer = en_nlp.tokenizer
     en_nlp.tokenizer = lambda string: old_tokenizer.tokens_from_list(regexp.findall(string))
 
     def custom_tokenizer(document):
+        """自定义的分词器"""
         # 后面的两个参数取消了
         # doc_spacy = en_nlp(document, entity = False, parse = False)
         doc_spacy = en_nlp(document)
         return [token.lemma_ for token in doc_spacy]
 
     from sklearn.feature_extraction.text import CountVectorizer
-    from sklearn.model_selection import GridSearchCV, StratifiedShuffleSplit
+    from sklearn.model_selection import StratifiedShuffleSplit
     from sklearn.linear_model import LogisticRegression
     param_grid = {'C': [0.001, 0.01, 0.1, 1, 10, 100]}
     # 仅使用1%的数据作为训练集来构建网格搜索，估计是为了尽快完成计算
-    cv = StratifiedShuffleSplit(n_splits = 5, test_size = 0.99, train_size = 0.01, random_state = 0)
-    classifier = LogisticRegression(solver = 'lbfgs', max_iter = 10000)
+    cv = StratifiedShuffleSplit(n_splits=5, test_size=0.99, train_size=0.01, random_state=0)
+    classifier = LogisticRegression(solver='lbfgs', max_iter=10000)
 
-    # 利用标准的CountVectorizer进行网格搜索
-    vectorizer = CountVectorizer(min_df = 5).fit(text_train)
+    show_subtitle("利用标准的CountVectorizer进行网格搜索")
+    vectorizer = CountVectorizer(min_df=5).fit(text_train)
     X_train = vectorizer.transform(text_train)
     X_test = vectorizer.transform(text_test)
-    print('=' * 50)
     print("X_train.shape: {}".format(X_train.shape))
     grid_search_logistic_regression(X_train, y_train, X_test, y_test, classifier, param_grid, cv)
     # X_train.shape: (3000, 8285)，0.58，{'C': 10}，0.81
@@ -522,11 +531,10 @@ def sklearn_lemmatization():
     # Best cross-validation score(standard CountVectorizer): 0.719
     # Best parameters(standard CountVectorizer): {'C': 1}
 
-    # 利用词形还原技术进行网格搜索
-    lemma_vectorizer = CountVectorizer(tokenizer = custom_tokenizer, min_df = 5).fit(text_train)
+    show_subtitle("利用词形还原技术进行网格搜索")
+    lemma_vectorizer = CountVectorizer(tokenizer=custom_tokenizer, min_df=5).fit(text_train)
     X_train_lemma = lemma_vectorizer.transform(text_train)
     X_test_lemma = lemma_vectorizer.transform(text_test)
-    print('=' * 50)
     print("X_train_lemma.shape: {}".format(X_train_lemma.shape))
     grid_search_logistic_regression(X_train_lemma, y_train, X_test_lemma, y_test, classifier, param_grid, cv)
     # X_train_lemma.shape: (3000, 6848)，0.58，{'C': 10}，0.81
@@ -534,38 +542,42 @@ def sklearn_lemmatization():
     # X_train_lemma.shape: (25000, 21692)
     # Best cross-validation score(lemmatization): 0.731
     # Best parameters(lemmatization): {'C': 1}
+
+    print("注1：对比 标准的 CountVectorizer 与 使用词形还原技术的 CountVectorizer 两种模型区别")
+    print("注2：词形还原对性能的提升帮助较小")
     pass
 
 
 # 7.9 主题建模和文档聚类
-def LDA_for_movie_reviews_with_ten_topics():
-    number_title = "主题建模和文档聚类"
-    print('\n', '-' * 5, number_title, '-' * 5)
-
+def lda_for_movie_reviews_with_ten_topics():
+    show_title("主题建模和文档聚类")
     text_train, y_train, text_test, y_test = load_data()
 
     # 对于无监督的文本文档，通常会删除非常常见的单词，避免分析过程受到过大的影响。
     # 本例中删除出现频次不大于15%的单词，即删除在15%以上的文档中出现过的单词。
     from sklearn.feature_extraction.text import CountVectorizer
-    vectorizer = CountVectorizer(max_features = 10000, max_df = .15)
+    vectorizer = CountVectorizer(max_features=10000, max_df=.15)
     # vectorizer = CountVectorizer(max_features = 10000)
     X_train = vectorizer.fit_transform(text_train)
     print("X_train.shape=", X_train.shape)
     # X_train.shape = (15000, 10000)
     # n_topics变成n_components了
     from sklearn.decomposition import LatentDirichletAllocation
-    # lda = LatentDirichletAllocation(n_topics = 10,learning_method = 'batch', max_iter = 25, random_state = 0,
+    # lda = LatentDirichletAllocation(n_topics = 10,learning_method = 'batch', max_iter = 25, random_state = seed,
     #                                 n_jobs = 3)
-    lda = LatentDirichletAllocation(n_components = 10, learning_method = 'batch', max_iter = 25, random_state = 0,
-                                    n_jobs = 3)
+    lda = LatentDirichletAllocation(n_components=10,
+                                    learning_method='batch',
+                                    max_iter=25,
+                                    random_state=0,
+                                    n_jobs=-1)
     documents_topics = lda.fit_transform(X_train)
     print("lda.components_.shape = ", lda.components_.shape)
     # lda.components_.shape = (10, 10000)
 
-    sorting = np.argsort(lda.components_, axis = 1)[:, ::-1]
+    sorting = np.argsort(lda.components_, axis=1)[:, ::-1]
     feature_names = np.array(vectorizer.get_feature_names())
-    mglearn.tools.print_topics(topics = range(10), feature_names = feature_names,
-                               sorting = sorting, topics_per_chunk = 5, n_words = 10)
+    mglearn.tools.print_topics(topics=range(10), feature_names=feature_names,
+                               sorting=sorting, topics_per_chunk=5, n_words=10)
 
     # 取出第3个主题的文档内容，第3个主题的内容都与电视连续剧相关
     # topic 3：show, series, episode, tv, episodes, shows, season, new, television, years
@@ -575,34 +587,35 @@ def LDA_for_movie_reviews_with_ten_topics():
         pass
 
 
-def LDA_for_movie_reviews_with_hundred_topics():
+def lda_for_movie_reviews_with_hundred_topics():
     # 计算时间非常长，运行前注意！
-    number_title = "主题建模和文档聚类应用于电影评论数据集"
-    print('\n', '-' * 5, number_title, '-' * 5)
-
+    show_title("主题建模和文档聚类应用于电影评论数据集")
     text_train, y_train, text_test, y_test = load_data()
 
     # 对于无监督的文本文档，通常会删除非常常见的单词，避免分析过程受到过大的影响。
     # 本例中删除出现频次不大于15%的单词，即删除在15%以上的文档中出现过的单词。
     from sklearn.feature_extraction.text import CountVectorizer
-    vectorizer = CountVectorizer(max_features = 10000, max_df = .15)
+    vectorizer = CountVectorizer(max_features=10000, max_df=.15)
     # vectorizer = CountVectorizer(max_features = 10000)
     X_train = vectorizer.fit_transform(text_train)
     print("X_train.shape=", X_train.shape)
 
     # n_topics变成n_components了
     from sklearn.decomposition import LatentDirichletAllocation
-    lda100 = LatentDirichletAllocation(n_components = 100, learning_method = 'batch', max_iter = 25, random_state = 0,
-                                       n_jobs = 3)
+    lda100 = LatentDirichletAllocation(n_components=100,
+                                       learning_method='batch',
+                                       max_iter=25,
+                                       random_state=0,
+                                       n_jobs=-1)
     documents_topics100 = lda100.fit_transform(X_train)
     print("lda100.components_.shape = ", lda100.components_.shape)
 
-    sorting = np.argsort(lda100.components_, axis = 1)[:, ::-1]
+    sorting = np.argsort(lda100.components_, axis=1)[:, ::-1]
     feature_names = np.array(vectorizer.get_feature_names())
     topics = np.array([7, 16, 24, 25, 28, 36, 37, 45, 51, 53, 54, 63, 89, 97])
     mglearn.tools.print_topics(
-            topics = topics, feature_names = feature_names,
-            sorting = sorting, topics_per_chunk = 7, n_words = 20)
+        topics=topics, feature_names=feature_names,
+        sorting=sorting, topics_per_chunk=7, n_words=20)
 
     # 按照第45个topic进行排序，第45个topic的内容都与音乐相关
     music = np.argsort(documents_topics100[:, 45])[::-1]
@@ -610,20 +623,20 @@ def LDA_for_movie_reviews_with_hundred_topics():
         print(b".".join(text_train[i].split(b".")[:2]) + b".\n")
         pass
 
-    fig, ax = plt.subplots(1, 2, figsize = (10, 10))
+    fig, ax = plt.subplots(1, 2, figsize=(10, 10))
     topic_names = ["{:>2}".format(i) + " ".join(words) for i, words in enumerate(feature_names[sorting[:, :2]])]
 
     for col in [0, 1]:
         start = col * 50
         end = (col + 1) * 50
-        ax[col].barh(np.arange(50), np.sum(documents_topics100, axis = 0)[start:end])
+        ax[col].barh(np.arange(50), np.sum(documents_topics100, axis=0)[start:end])
         ax[col].set_yticks(np.arange(50))
-        ax[col].set_yticklabels(topic_names[start:end], ha = 'left', va = 'top')
+        ax[col].set_yticklabels(topic_names[start:end], ha='left', va='top')
         ax[col].invert_yaxis()
         # ax[col].set_xlim(0, 20)
         ax[col].set_xlim(0, 2000)
         yax = ax[col].get_yaxis()
-        yax.set_tick_params(pad = 130)
+        yax.set_tick_params(pad=130)
         pass
     plt.suptitle("图7-6：LDA学到的主题权重")
     pass
@@ -633,53 +646,41 @@ def LDA_for_movie_reviews_with_hundred_topics():
 #   - 特定类型的主题：与电影相关的评论
 #   - 特定评分的主题：与评分相关的评论
 
-if __name__ == "__main__":
+def main():
     # 电影评论数据集
     # load_databases()
-
     # 7.3 将文本数据转换为数值表示（词袋）
     # transform_to_bag_of_words()
-
     # 7.3.2 将词袋应用于电影评论
     # bag_of_words_for_movie_reviews()
-
     # 删除那些不具有信息量的单词，即某些单词只出现在少量文档中，例如：数字、错误拼写的单词、生僻词等等
     # bag_of_words_for_movie_reviews_min_df()
-
     # 删除 不具有信息量的单词+停用词
     # bag_of_words_for_movie_reviews_stop_words()
-
     # 删除 不具有信息量的单词+停用词+出现在大量文档中的单词
     # bag_of_words_for_movie_reviews_max_df()
-
     # 7.5 用tf-idf缩放数据（提高计算的速度，不改变模型的精度）
     # bag_of_words_for_movie_reviews_tf_idf()
-
     # 7.7 多个单词的词袋（N元分词）
     # transform_to_n_gram()
-
     # 基于N元语法模型建立电影评论数据集的词袋
     # bag_of_words_for_movie_reviews_n_gram()
-
+    # bag_of_words_for_movie_reviews_3_gram()
     # 7.8 词干提取和词形还原
     # word_normalization()
-
     # 了解正则表达式
     # test_regularization()
-
-    # 通过使用CountVectorizer所使用的基于正则表达式的分词器来替换spacy的分词器
+    # 通过使用 CountVectorizer 所使用的基于正则表达式的分词器来替换 spacy 的分词器
     # 计算时间非常长，运行前注意！
     # sklearn_lemmatization()
-
-    # LDA_for_movie_reviews_with_ten_topics()
-
+    # lda_for_movie_reviews_with_ten_topics()
     # 主题建模和文档聚类应用于电影评论数据集
     # 计算时间非常长，运行前注意！
-    LDA_for_movie_reviews_with_hundred_topics()
-    import winsound
-
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
+    # lda_for_movie_reviews_with_hundred_topics()
     pass
+
+
+if __name__ == "__main__":
+    main()
+    beep_end()
+    show_figures()
