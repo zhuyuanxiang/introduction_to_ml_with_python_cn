@@ -17,7 +17,6 @@
 import sklearn
 from sklearn.model_selection import train_test_split
 
-from config import seed
 from preamble import *
 
 
@@ -32,19 +31,19 @@ def make_my_wave(n_samples=100):
 
 def load_train_test_wave(n_samples=100):
     X, y = make_my_wave(n_samples=n_samples)
-    return train_test_split(X, y, random_state=seed)
+    return train_test_split(X, y, random_state=0)
 
 
 # ----------------------------------------------------------------------
 def load_train_test_breast_cancer():
     cancer = sklearn.datasets.load_breast_cancer()
-    return train_test_split(cancer.data, cancer.target, stratify=cancer.target, random_state=seed)
+    return train_test_split(cancer.data, cancer.target, stratify=cancer.target, random_state=0)
 
 
 # ----------------------------------------------------------------------
 def make_my_forge(centers=2, n_samples=30):
     # a carefully hand-designed dataset lol
-    X, y = sklearn.datasets.make_blobs(centers=centers, random_state=seed // 12, n_samples=n_samples)
+    X, y = sklearn.datasets.make_blobs(centers=centers, random_state=4, n_samples=n_samples)
     y[np.array([7, 27])] = 0
     mask = np.ones(len(X), dtype=np.bool)
     mask[np.array([0, 1, 5, 26])] = 0
@@ -62,19 +61,25 @@ def load_my_extended_boston():
 
 def load_train_test_extended_boston():
     X, y = load_my_extended_boston()
-    return train_test_split(X, y, random_state=seed)
+    return train_test_split(X, y, random_state=0)
+
+
+# ----------------------------------------------------------------------
+def load_train_test_boston():
+    boston = sklearn.datasets.load_boston()
+    return train_test_split(boston.data, boston.target, random_state=0)
 
 
 # ----------------------------------------------------------------------
 def load_train_test_iris():
     iris = sklearn.datasets.load_iris()
-    return train_test_split(iris.data, iris.target, stratify=iris.target, random_state=seed)
+    return train_test_split(iris.data, iris.target, stratify=iris.target, random_state=0)
 
 
 # ----------------------------------------------------------------------
 def load_train_test_moons(n_samples=100, noise=0.25):
-    X, y = sklearn.datasets.make_moons(n_samples=n_samples, noise=noise, random_state=seed)
-    return train_test_split(X, y, stratify=y, random_state=seed)
+    X, y = sklearn.datasets.make_moons(n_samples=n_samples, noise=noise, random_state=0)
+    return train_test_split(X, y, stratify=y, random_state=0)
 
 
 # ----------------------------------------------------------------------
@@ -96,7 +101,7 @@ def load_train_test_faces():
     y_people = people.target[mask]
     # 将灰度值缩放到[0,1]之间，而不是[0,255]之间，可以得到更好的数据稳定性
     X_people = X_people / 255.
-    return train_test_split(X_people, y_people, stratify=y_people, random_state=seed)
+    return train_test_split(X_people, y_people, stratify=y_people, random_state=0)
 
 
 # ----------------------------------------------------------------------
@@ -112,4 +117,4 @@ def load_adult_data():
 def load_train_test_blobs():
     from sklearn.datasets import make_blobs
     X, y = make_blobs(random_state=0)
-    return train_test_split(X, y, random_state=seed)
+    return train_test_split(X, y, random_state=0)
