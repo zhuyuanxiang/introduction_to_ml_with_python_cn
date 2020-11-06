@@ -13,24 +13,22 @@
 @Reference  :   《Python机器学习基础教程》, Ch08，P278
 @Desc       :   全书总结。建立自己的分类器。
 """
-import matplotlib.pyplot as plt
-import mglearn
-import numpy as np
+from tools import *
 
 # 设置数据显示的精确度为小数点后3位
-np.set_printoptions(precision = 3, suppress = True, threshold = np.inf, linewidth = 200)
+np.set_printoptions(precision=3, suppress=True, threshold=np.inf, linewidth=200)
 
 import unittest
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class MyTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, first_parameter = 1, second_parameter = 2):
+    def __init__(self, first_parameter=1, second_parameter=2):
         self.first_parameter = first_parameter
         self.second_parameter = second_parameter
         pass
 
-    def fit(self, X, y = None):
+    def fit(self, X, y=None):
         # fit应该只接受X和y作为参数，即使模型是无监督的，也需要y参数。
         # 下面是模型拟合的代码
         return self
@@ -52,10 +50,5 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    import winsound
-
-    # 运行结束的提醒
-    winsound.Beep(600, 500)
-    if len(plt.get_fignums()) != 0:
-        plt.show()
-    pass
+    beep_end()
+    show_figures()
